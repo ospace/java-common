@@ -53,7 +53,6 @@ public class MathUtils {
 		return null == r ? null : (null == l ? null : l.multiply(r));
 	}
 	
-	
 	public static BigDecimal addRate(BigDecimal l, BigDecimal r) {
 		return add(l, calcRate(l,r));
 	}

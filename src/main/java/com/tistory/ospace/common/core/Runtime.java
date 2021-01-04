@@ -1,4 +1,4 @@
-package com.tistory.ospace.common.util;
+package com.tistory.ospace.common.core;
 
 public class Runtime extends BaseObject {
 	long begin_time = 0;

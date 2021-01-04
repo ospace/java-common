@@ -1,8 +1,10 @@
-package com.tistory.ospace.common.util;
+package com.tistory.ospace.common.core;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
+
+import com.tistory.ospace.common.util.DataUtils;
 
 public abstract class ObjectInvoker {
 	private Object                target;

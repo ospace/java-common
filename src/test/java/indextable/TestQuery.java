@@ -8,9 +8,9 @@ import java.util.Iterator;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.tistory.ospace.common.indextable.IndexType;
+import com.tistory.ospace.common.indextable.ResultSet;
 import com.tistory.ospace.common.indextable.SimpleIndexTable;
-import com.tistory.ospace.common.indextable.core.IndexType;
-import com.tistory.ospace.common.indextable.core.ResultSet;
 import com.tistory.ospace.common.indextable.query.Query;
 
 public class TestQuery {

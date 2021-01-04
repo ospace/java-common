@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -21,6 +22,14 @@ public class StringUtils {
 
 	public static boolean isEmpty(String str) {
 		return null == str ? true : str.isEmpty();
+	}
+	
+	public static String isEmpty(String val, String init) {
+		return isEmpty(val) ? init : val;
+	}
+	
+	public static <R> R isEmpty(String val, R init, Function<String, R> action) {
+		return isEmpty(val) ? init : action.apply(val);
 	}
 	
 	public static boolean isNotEmpty(String str) {
@@ -128,6 +137,4 @@ public class StringUtils {
 	public static String gnerateUUID() {
 		return UUID.randomUUID().toString();
 	}
-	
-	
 }

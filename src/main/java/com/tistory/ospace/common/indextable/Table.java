@@ -1,4 +1,4 @@
-package com.tistory.ospace.common.indextable.core;
+package com.tistory.ospace.common.indextable;
 
 import java.util.List;
 import java.util.Map;

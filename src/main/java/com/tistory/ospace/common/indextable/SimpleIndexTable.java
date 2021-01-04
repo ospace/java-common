@@ -12,9 +12,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
 
-import com.tistory.ospace.common.indextable.core.IndexType;
-import com.tistory.ospace.common.indextable.core.ResultSet;
-import com.tistory.ospace.common.indextable.core.Table;
 import com.tistory.ospace.common.indextable.query.Query;
 import com.tistory.ospace.common.indextable.query.Queryable;
 

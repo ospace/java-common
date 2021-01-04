@@ -1,4 +1,4 @@
-package com.tistory.ospace.common.util;
+package com.tistory.ospace.common.core;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -14,6 +14,9 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.tistory.ospace.common.util.DataUtils;
+import com.tistory.ospace.common.util.StringUtils;
 
 public class HTTPConnection {
 	private static final Logger LOGGER = LoggerFactory.getLogger(HTTPConnection.class);

@@ -12,7 +12,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.tistory.ospace.common.indextable.core.Table;
+import com.tistory.ospace.common.indextable.Table;
 
 
 public class QueryUtils {

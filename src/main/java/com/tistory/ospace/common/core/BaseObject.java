@@ -1,4 +1,6 @@
-package com.tistory.ospace.common.util;
+package com.tistory.ospace.common.core;
+
+import com.tistory.ospace.common.util.StringUtils;
 
 public class BaseObject implements Cloneable {
 	@Override

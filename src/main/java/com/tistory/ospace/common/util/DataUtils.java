@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -315,6 +316,60 @@ public class DataUtils {
 		P[] ret = (P[]) Array.newInstance(data.get(0).getClass(), data.size());
 		data.toArray(ret);
 		
+		return ret;
+	}
+	
+	public static Integer min(Integer l, Integer r) {
+		if (null == l) return r;
+		if (null == r) return l;
+		
+		return Math.min(l, r);
+	}
+	
+	final static int prime = 31;
+	public static int hashCode(Object ...args) {
+		if (DataUtils.isEmpty(args)) return 0;
+		
+		int result = 1;
+		for(Object each : args) {
+			result = prime * result + (null == each ? 0 : each.hashCode());
+		}
+		
+		return result;
+	}
+	
+	public static <R, T> Integer sum(Collection<T> data, Function<T, Integer> action) {
+		return reduce(data, (ret, it) -> {
+			int val = action.apply(it);
+			return null == ret ? val : ret + val;
+		});
+	}
+	
+	public static <R, T> Integer min(Collection<T> data, Function<T, Integer> action) {
+		return reduce(data, (ret, it) -> {
+			int val = action.apply(it);
+			return null == ret ? val : Math.min(ret,  val);
+		});
+	}
+	
+	public static <R, T> Integer max(Collection<T> data, Function<T, Integer> action) {
+		return reduce(data, (ret, it) -> {
+			int val = action.apply(it);
+			return null == ret ? val : Math.max(ret,  val);
+		});
+	}
+
+	@SafeVarargs
+	public static <T> List<T> asList(T ...args) {
+		if(DataUtils.isEmpty(args)) return null;
+		if(1 == args.length && null == args[0]) return null;
+		
+		return Arrays.asList(args);
+	}
+
+	public static <P extends Comparable<P>> List<P> toSortedList(Set<P> data) {
+		List<P> ret = new ArrayList<>(data);
+		ret.sort((l,r)->l.compareTo(r));
 		return ret;
 	}
 }

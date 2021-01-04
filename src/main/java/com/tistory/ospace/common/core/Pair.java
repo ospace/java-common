@@ -1,4 +1,6 @@
-package com.tistory.ospace.common.util;
+package com.tistory.ospace.common.core;
+
+import com.tistory.ospace.common.util.CmmUtils;
 
 //import com.google.common.base.Objects;
 
@@ -33,20 +35,19 @@ public class Pair<F, S> extends BaseObject {
 		this.second = second;
 	}
 	
-//	@Override
-//	public boolean equals(final Object other) {
-//		if(this == other) return true;
-//		if (!(other instanceof Pair)) return false;
-//		
-//		final Pair<?, ?> pair = Pair.class.cast(other);
-//		
-//		return Objects.equal(first, pair.first)
-//		    && Objects.equal(second, pair.second);
-//	}
-//	 
-//	@Override
-//	public int hashCode() {
-//		return Objects.hashCode(first, second);
-//	}
+	@Override
+	public boolean equals(final Object other) {
+		if(this == other) return true;
+		if (!(other instanceof Pair)) return false;
+		
+		final Pair<?, ?> pair = Pair.class.cast(other);
+		
+		return pair.first.equals(first) && pair.second.equals(second);
+	}
+	 
+	@Override
+	public int hashCode() {
+		return CmmUtils.hashCode(first, second);
+	}
 	
 }

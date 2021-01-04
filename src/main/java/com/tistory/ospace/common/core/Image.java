@@ -1,9 +1,11 @@
-package com.tistory.ospace.common.util;
+package com.tistory.ospace.common.core;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+
+import com.tistory.ospace.common.util.ImageUtils;
 
 public class Image {
 	private String        filepath;

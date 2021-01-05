@@ -1,6 +1,6 @@
 package indextable;
 
-import static com.tistory.ospace.common.indextable.query.QueryOp.*;
+import static com.tistory.ospace.common.indexedtable.query.QueryOp.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,10 +10,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.Test;
 
-import com.tistory.ospace.common.indextable.IndexType;
-import com.tistory.ospace.common.indextable.ResultSet;
-import com.tistory.ospace.common.indextable.SimpleIndexTable;
-import com.tistory.ospace.common.indextable.query.Query;
+import com.tistory.ospace.common.indexedtable.IndexType;
+import com.tistory.ospace.common.indexedtable.IndexedTable;
+import com.tistory.ospace.common.indexedtable.ResultSet;
+import com.tistory.ospace.common.indexedtable.query.Query;
 
 public class TestSimple {
 	public static class Item {
@@ -70,8 +70,8 @@ public class TestSimple {
 		}
 	}
 	
-	static SimpleIndexTable<Item> generateIndexTable() {
-		SimpleIndexTable<Item> index = SimpleIndexTable.of(Item.class);//, "name", "num");
+	static IndexedTable<Item> generateIndexTable() {
+		IndexedTable<Item> index = IndexedTable.of(Item.class);//, "name", "num");
 		index.addIndex("name", it->it.name);
 		index.addIndex("num", it->it.num, IndexType.TREE);
 		index.addIndex("nums", it->it.nums, IndexType.TREE);
@@ -124,7 +124,7 @@ public class TestSimple {
 		System.out.println("subMap : " + data.subMap("10", true, "3", true));
 
 		long begin_time = System.currentTimeMillis();
-		SimpleIndexTable<Item> index2 = generateIndexTable();
+		IndexedTable<Item> index2 = generateIndexTable();
 		long end_time = System.currentTimeMillis();
 		
 		System.out.println("init  time  " + (end_time-begin_time) + " msec");
@@ -150,7 +150,7 @@ public class TestSimple {
 	@Test
 	public void testListQuery() {
 		
-		SimpleIndexTable<Item> index = generateIndexTable();
+		IndexedTable<Item> index = generateIndexTable();
 		Query<Item> query = in("name", Arrays.asList("Monday", "Wednesday"));
 		ResultSet<Item> res = null;
 		res = index.query(query);

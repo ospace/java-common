@@ -1,4 +1,4 @@
-package com.tistory.ospace.common.indextable;
+package com.tistory.ospace.common.indexedtable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,20 +12,20 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
 
-import com.tistory.ospace.common.indextable.query.Query;
-import com.tistory.ospace.common.indextable.query.Queryable;
+import com.tistory.ospace.common.indexedtable.query.Query;
+import com.tistory.ospace.common.indexedtable.query.Queryable;
 
 
-public class SimpleIndexTable<T extends Object> implements Table<T>, Queryable<T>{
+public class IndexedTable<T extends Object> implements Table<T>, Queryable<T>{
 	private ArrayList<T>                               data = new ArrayList<>();
 	private Map<String, Map<Object, Set<Integer>>>     indexes = new HashMap<>();
 	private Map<String, Function<T, ? extends Object>> methods = new HashMap<>();
 	
-	public static <T> SimpleIndexTable<T> of(Class<T> clazz) {
-		return new SimpleIndexTable<T>();
+	public static <T> IndexedTable<T> of(Class<T> clazz) {
+		return new IndexedTable<T>();
 	}
 	
-	public SimpleIndexTable() {}
+	public IndexedTable() {}
 	
 	public <R> void addIndex(String name, Function<T,R> getter) {
 		addIndex(name, getter, IndexType.HASH);

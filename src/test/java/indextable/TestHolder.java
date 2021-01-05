@@ -1,6 +1,6 @@
 package indextable;
 
-import static com.tistory.ospace.common.indextable.query.QueryOp.*;
+import static com.tistory.ospace.common.indexedtable.query.QueryOp.*;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -8,15 +8,15 @@ import java.util.Iterator;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.tistory.ospace.common.indextable.ResultSet;
-import com.tistory.ospace.common.indextable.SimpleIndexTable;
-import com.tistory.ospace.common.indextable.query.Query;
+import com.tistory.ospace.common.indexedtable.IndexedTable;
+import com.tistory.ospace.common.indexedtable.ResultSet;
+import com.tistory.ospace.common.indexedtable.query.Query;
 
 
 public class TestHolder {
 	@Test
 	public void testSimpleHolder() {
-		SimpleIndexTable<Foo> index2 = new SimpleIndexTable<>();
+		IndexedTable<Foo> index2 = new IndexedTable<>();
 		
 		index2.addIndex("name", it->it.name);
 		index2.addIndex("num", it->it.num);

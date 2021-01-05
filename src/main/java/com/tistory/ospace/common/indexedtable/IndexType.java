@@ -1,4 +1,4 @@
-package com.tistory.ospace.common.indextable;
+package com.tistory.ospace.common.indexedtable;
 
 import com.tistory.ospace.common.util.DataUtils;
 

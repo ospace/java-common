@@ -9,6 +9,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -122,7 +123,7 @@ public class FileUtils {
 		}catch (Exception e){
 			
 		}finally{
-			if(in != null)	try{in.close();} catch (IOException e) {}
+			closeSafe(in);
 		}
 
 		return dataList.toString();
@@ -145,8 +146,8 @@ public class FileUtils {
 		} catch (IOException e) {
 			
 		}finally{
-			if(out != null)	try{out.close();} catch (IOException e) {}
-			if(fos != null)	try{fos.close();} catch (IOException e) {}
+			closeSafe(out);
+			closeSafe(fos);
 		}
 	}
 	
@@ -165,9 +166,7 @@ public class FileUtils {
 		} catch(Exception e) {
 			throw new RuntimeException("readFile", e);
 		} finally {
-			if(null != in) {
-				try { in.close(); } catch(IOException e) {}
-			}
+			closeSafe(in);
 		}
 		
 		return sb.toString();
@@ -258,7 +257,7 @@ public class FileUtils {
 			copy(in, out);
 		} finally {
 			if(null != in) {
-				try { in.close(); } catch (IOException e) {}
+				closeSafe(in);
 			}
 			
 			try { out.flush(); } catch (IOException e) {}
@@ -281,6 +280,18 @@ public class FileUtils {
 		out.flush();
 		
 		return total;
+	}
+	
+	public static void closeSafe(Closeable closeable) {
+		if(null == closeable) return;
+		try {
+			closeable.close();
+		} catch (IOException e) {
+		}
+	}
+	
+	public static String currentDir() {
+		return System.getProperty("user.dir");
 	}
 }
 

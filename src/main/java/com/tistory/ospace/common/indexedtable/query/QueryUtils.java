@@ -1,4 +1,4 @@
-package com.tistory.ospace.common.indextable.query;
+package com.tistory.ospace.common.indexedtable.query;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +12,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.tistory.ospace.common.indextable.Table;
+import com.tistory.ospace.common.indexedtable.Table;
 
 
 public class QueryUtils {

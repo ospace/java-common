@@ -1,9 +1,12 @@
 package util;
 
+import java.util.List;
+
 public class Bar {
 	private Long id;
 	private String name;
 	private String createdDate;
+	private List<Integer> data;
 	
 	public Long getId() {
 		return id;
@@ -23,9 +26,14 @@ public class Bar {
 	public void setCreatedDate(String createdDate) {
 		this.createdDate = createdDate;
 	}
-	
+	public List<Integer> getData() {
+		return data;
+	}
+	public void setData(List<Integer> data) {
+		this.data = data;
+	}
 	@Override
 	public String toString() {
-		return "Bar [id=" + id + ", name=" + name + ", createdDate=" + createdDate + "]";
+		return "Bar [id=" + id + ", name=" + name + ", createdDate=" + createdDate + ", data=" + data + "]";
 	}
 }

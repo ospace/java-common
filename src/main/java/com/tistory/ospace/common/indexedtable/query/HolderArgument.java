@@ -1,4 +1,4 @@
-package com.tistory.ospace.common.indextable.query;
+package com.tistory.ospace.common.indexedtable.query;
 
 import java.util.List;
 

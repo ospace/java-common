@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -134,7 +136,28 @@ public class StringUtils {
 		return sb.toString();
 	}
 	
-	public static String gnerateUUID() {
+	public static String newUUID() {
 		return UUID.randomUUID().toString();
+	}
+	
+	public static String newId() {
+		return UUID.randomUUID().toString().replace("-", "");
+	}
+	
+	private static Pattern formatPattern = Pattern.compile("\\{(\\w+?\\)}");
+	public static String format(String fmt, Object ...args) {
+		StringBuffer ret = new StringBuffer();
+		
+		Matcher matcher = formatPattern.matcher(fmt);
+		while(matcher.find()) {
+		   for(int i=1; i<=matcher.groupCount(); ++i) {
+		       Integer idx = Integer.parseInt(matcher.group(i));
+		       if(args.length >= idx) continue;
+		       Object val = args[idx];
+		       matcher.appendReplacement(ret, null == val ? null : (String.class.equals(val.getClass()) ? (String)val : val.toString()));
+		   }
+		}
+		
+		return ret.toString();
 	}
 }

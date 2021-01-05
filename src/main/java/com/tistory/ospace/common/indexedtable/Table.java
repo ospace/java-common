@@ -1,10 +1,10 @@
-package com.tistory.ospace.common.indextable;
+package com.tistory.ospace.common.indexedtable;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.tistory.ospace.common.indextable.query.Query;
+import com.tistory.ospace.common.indexedtable.query.Query;
 
 
 public interface Table<T> {

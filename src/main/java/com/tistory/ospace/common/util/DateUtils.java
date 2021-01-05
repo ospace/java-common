@@ -29,7 +29,7 @@ public class DateUtils {
 	 * @param dateStr
 	 * @param standardZone
 	 * @param changeZone
-	 * @return
+	 * @return ZonedDateTime
 	 */
 	public static ZonedDateTime getDateTime(String dateStr, DateTimeFormatterBuilder builder, ZoneId standardZone, ZoneId changeZone) {
 		ZonedDateTime date = parse(dateStr, builder, standardZone).withZoneSameInstant(changeZone);
@@ -51,7 +51,7 @@ public class DateUtils {
 	/**
 	 * Builder를 넘겨주지 않는 경우 default로 선언 해놓은 DateTimeFormatterBuilder 사용
 	 * @param dateStr
-	 * @return
+	 * @return ZonedDateTime
 	 */
 	public static ZonedDateTime getDateTime(String dateStr) {
 		if (StringUtils.isEmpty(dateStr)) return null;
@@ -62,7 +62,7 @@ public class DateUtils {
 	/**
 	 * Calendar convert to ZonedDateTime
 	 * @param calendar
-	 * @return
+	 * @return ZonedDateTime
 	 */
 	public static ZonedDateTime getDateTime(Calendar calendar, ZoneId standardZone, ZoneId changeZone) {
 		ZonedDateTime date = ZonedDateTime.ofInstant(calendar.toInstant(), standardZone).withZoneSameInstant(changeZone);
@@ -82,7 +82,7 @@ public class DateUtils {
 	/**
 	 * Millisecond convert to ZonedDateTime
 	 * @param tms
-	 * @return
+	 * @return ZonedDateTime
 	 */
 	public static ZonedDateTime getDateTimeOfMilli(long tms) {
 		return Instant.ofEpochMilli(tms).atZone(LOCAL);
@@ -92,7 +92,7 @@ public class DateUtils {
 	 * parse ZonedDateTime
 	 * @param dateStr
 	 * @param zone
-	 * @return
+	 * @return ZonedDateTime
 	 */
 	private static ZonedDateTime parse(String dateStr, DateTimeFormatterBuilder builder, ZoneId zone) {
 		if(dateStr.length() > 10) {
@@ -116,7 +116,7 @@ public class DateUtils {
 	 * change date format
 	 * @param date
 	 * @param pattern
-	 * @return
+	 * @return String
 	 */
 	public static String datePattern(ZonedDateTime date, String pattern) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
@@ -128,7 +128,7 @@ public class DateUtils {
 	 * locale parameter 넘겨줄 시 해당 locale의 요일명으로 반환
 	 * @param date
 	 * @param locale
-	 * @return
+	 * @return String
 	 */
 	public static String getDayOfWeek(ZonedDateTime date, Locale locale) {
 		return date.getDayOfWeek().getDisplayName(TextStyle.FULL, locale);
@@ -139,7 +139,7 @@ public class DateUtils {
 	
 	/**
 	 * get today
-	 * @return
+	 * @return ZonedDateTime
 	 */
 	public static ZonedDateTime getToday() {
 		return ZonedDateTime.now(ZoneId.systemDefault());
@@ -149,7 +149,12 @@ public class DateUtils {
 		return datePattern(getToday(), pattern);
 	}
 	
-	//current 날짜 기준으로 생일을 적용하여 나이를 계산
+	/**
+	 * 날짜 기준으로 생일을 적용하여 나이를 계산
+	 * @param birthday
+	 * @param current
+	 * @return int
+	 */
 	public static int getAge(ZonedDateTime birthday, ZonedDateTime current) {
 		return (int) ChronoUnit.YEARS.between(birthday, current);
 	}
@@ -158,11 +163,12 @@ public class DateUtils {
 	 * get difference of days
 	 * @param start
 	 * @param end
-	 * @return
+	 * @return long
 	 */
 	public static long getDiffOfDays(ZonedDateTime start, ZonedDateTime end) {
 		return ChronoUnit.DAYS.between(start.toInstant(), end.toInstant());
 	}
+	
 	
 	public static long getDiffOfDays(String start, String end) {
 		return ChronoUnit.DAYS.between(getDateTime(start).toInstant(), getDateTime(end).toInstant());
@@ -172,7 +178,7 @@ public class DateUtils {
 	 * get difference of minutes
 	 * @param start
 	 * @param end
-	 * @return
+	 * @return long
 	 */
 	public static long getDiffOfMinutes(ZonedDateTime start, ZonedDateTime end) {
 		return ChronoUnit.MINUTES.between(start.toInstant(), end.toInstant());
@@ -186,7 +192,7 @@ public class DateUtils {
 	 * get difference of seconds
 	 * @param start
 	 * @param end
-	 * @return
+	 * @return long
 	 */
 	public static long getDiffOfSeconds(ZonedDateTime start, ZonedDateTime end) {
 		return ChronoUnit.SECONDS.between(start.toInstant(), end.toInstant());
@@ -199,7 +205,7 @@ public class DateUtils {
 	/**
 	 * 입력받은 시간(분) 정보로 ZoneId 반환
 	 * @param minutes
-	 * @return
+	 * @return ZoneId
 	 */
 	public static ZoneId getZoneIdOfMinutes(long minutes) {
 		int hours = (int)(minutes / 60);

@@ -1,8 +1,11 @@
 package com.tistory.ospace.common.util;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Function;
@@ -77,9 +80,9 @@ public class StringUtils {
 	private static final ObjectMapper jsonSimpleObjectMapper = new ObjectMapper()
 		.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 		.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
-		.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+		.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES) //없는 프로퍼티를 매핑 에러 처리
 		.enable(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT)
-		.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+		.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT) //프로퍼티에 빈문자열을 NULL로 매핑
 		.registerModule(new JavaTimeModule())
 		.setSerializationInclusion(Include.NON_NULL);
 	public static <T> String toJsonString(T obj, boolean isPretty) {
@@ -128,10 +131,14 @@ public class StringUtils {
 	
 	private static final String DEFAULT_KEY_SOURCE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	public static String generateKey(int size) {
+		return generateKey(size, DEFAULT_KEY_SOURCE);
+	}
+	
+	public static String generateKey(int size, String keySource) {
 		Random rand = new Random();
 		StringBuilder sb = new StringBuilder();
 		for(int i=0; i<size; ++i) {
-			sb.append(DEFAULT_KEY_SOURCE.charAt(rand.nextInt(DEFAULT_KEY_SOURCE.length())));
+			sb.append(keySource.charAt(rand.nextInt(keySource.length())));
 		}
 		return sb.toString();
 	}
@@ -159,5 +166,68 @@ public class StringUtils {
 		}
 		
 		return ret.toString();
+	}
+	
+	public static String mapping(String str, Map<String,String> map) {
+		StringBuffer ret = new StringBuffer();
+		
+		Matcher matcher = formatPattern.matcher(str);
+		while(matcher.find()) {
+		   for(int i=1; i<=matcher.groupCount(); ++i) {
+			   String key = matcher.group(i);
+		       String val = map.get(key);
+		       
+		       if(null == val) continue;
+		       matcher.appendReplacement(ret, val);
+		   }
+		}
+		
+		return ret.toString();
+	}
+	
+	public static String toString(ByteBuffer byteBuffer) {
+		return toString(byteBuffer, Charset.forName("UTF-8"));
+	}
+	
+	public static String toString(ByteBuffer byteBuffer, Charset charset) {
+		return charset.decode(byteBuffer).toString();
+	}
+	
+	public static ByteBuffer toByteBuffer(String str) {
+		return toByteBuffer(str, Charset.forName("UTF-8"));
+	}
+	
+	public static ByteBuffer toByteBuffer(String str, Charset charset) {
+		return charset.encode(str);
+	}
+	
+	public static boolean isKorean(String data) {
+		if(isEmpty(data)) return false;
+		
+		return data.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*");
+	}
+	
+	public static boolean isKorean2(String data) {
+		if(isEmpty(data)) return false;
+		for(int i=0; i<data.length(); ++i) {
+			if (5 == Character.getType(data.charAt(i))) return true;
+		}
+		
+		return false;
+	}
+	
+	public static String replaceAll(String str, String from, String to) {
+		StringBuffer sb = new StringBuffer();
+
+		int idx = 0, pt = 0;
+
+		while(0 < (pt = str.indexOf(from, idx))) {
+			sb.append(str.substring(idx, pt)).append(to);
+			idx = pt + from.length();
+		}
+
+		if(idx < str.length()) sb.append(str.substring(idx));
+		
+		return sb.toString();
 	}
 }

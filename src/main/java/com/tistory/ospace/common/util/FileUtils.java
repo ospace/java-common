@@ -9,7 +9,6 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -20,23 +19,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
 import java.io.Writer;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 public class FileUtils {
 	public static final int BUFFER_SIZE = 4*1024;
 
-	/**
-	 * 이미지 리사이징
-	 * @param originalFile
-	 * @param thumbnailFile
-	 * @param thumbWidth
-	 * @param thumbHeight
-	 * @param quality
-	 * @throws Exception
-	 */
 	public static void makeThumbNail(String originalFile, String thumbnailFile, int thumbWidth, int thumbHeight) throws Exception{
 		
 		Image image = javax.imageio.ImageIO.read(new File(originalFile));
@@ -73,27 +74,7 @@ public class FileUtils {
 		       
 	}
 	
-	/***
-	 * 파일 사이즈 <p>
-	 * @param file
-	 * @return String
-	 */
 	public static  String getFileSize(Long size){	
-
-		/*
-		String size = "0";
-
-		if(file < 1024){
-			size = file + " B";
-		}else if(file >= 1024 && file < 1024 * 1024){
-			size = String.format("%.2f", (double)file / 1024 ) + " KB";
-		}else{
-			size = String.format("%.2f", (double)file / 1024 ) + " MB";
-		}
-
-		return size;
-		*/
-		
 		if (size <= 0)	return "0";
 		
 		final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
@@ -101,78 +82,54 @@ public class FileUtils {
 		return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 	
-	/***
-	 * 파일읽기
-	 * @param path : 파일경로<br>
-	 * @param filename : 파일명
-	 * @return
-	 */
 	public static String getFileRead(String path, String filename) {
 		
 		StringBuffer dataList = new StringBuffer();
-		BufferedReader in = null;
-		try{
-			File oTmpFile = new File(path, filename);
-			if (!oTmpFile.exists()) 	dataList.append("");
-
-			in = new java.io.BufferedReader(new FileReader(oTmpFile));
+		
+		File oTmpFile = new File(path, filename);
+		if (!oTmpFile.exists()) dataList.append("");
+		
+		try (BufferedReader in = new java.io.BufferedReader(new FileReader(oTmpFile))){
 			while(in.ready()) {
 				dataList.append(in.readLine()+ "\n");
 			}
-
-		}catch (Exception e){
-			
-		}finally{
-			closeSafe(in);
+		} catch (Exception e){
 		}
 
 		return dataList.toString();
 	}
 		
-	/***
-	 * 파일쓰기
-	 * @param str : 파일내용
-	 * @param filename : 파일명(경로포함)
-	 */
 	public static void setFileWrite(String str, String filename, String charset) { 
-		FileOutputStream fos = null;
-		Writer out = null;
 		
-		try  {
-			fos = new FileOutputStream(filename); 
-			out = new OutputStreamWriter(fos, charset); 
+		
+		try (
+			FileOutputStream fos = new FileOutputStream(filename);
+			Writer out = new OutputStreamWriter(fos, charset);
+		) {
 			out.write(str); 
-			
 		} catch (IOException e) {
-			
-		}finally{
-			closeSafe(out);
-			closeSafe(fos);
 		}
 	}
 	
 	public static String readString(String filepath) {
 		StringBuffer sb = new StringBuffer();
-		BufferedReader in = null;
-		try {
-			File file = new File(filepath);
-			if (!file.exists()) return null;
-			
-			in = new BufferedReader(new FileReader(file));
+		
+		File file = new File(filepath);
+		if (!file.exists()) return null;
+		
+		try (BufferedReader in = new BufferedReader(new FileReader(file))){
 			while(in.ready()) {
 				sb.append(in.readLine());
 				sb.append("\n");
 			}
 		} catch(Exception e) {
 			throw new RuntimeException("readFile", e);
-		} finally {
-			closeSafe(in);
 		}
 		
 		return sb.toString();
 	}
 	
-	public static boolean writeString(String filepath, String content) {
+	public static boolean writeString(String filepath, String data) {
 		File file = new File(filepath);
 		
 		String path = file.getParentFile().toString();
@@ -182,7 +139,7 @@ public class FileUtils {
 		BufferedWriter bw = null;
 		try {
 			bw = new BufferedWriter(new FileWriter(file));
-			bw.write(content);
+			bw.write(data);
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
@@ -207,7 +164,7 @@ public class FileUtils {
 			if(!dir.exists()) dir.mkdirs();
 			
 			FileOutputStream fos = new FileOutputStream(file);
-			writer = new BufferedOutputStream(fos, 4*1024);
+			writer = new BufferedOutputStream(fos, BUFFER_SIZE);
 			writeBin(writer, data);
 			writer.flush();
 		} catch (IOException e) {
@@ -218,11 +175,24 @@ public class FileUtils {
 	public static void writeBin(OutputStream out, byte[] data) throws IOException {
 		out.write(data);
 	}
-
-	/**
-	 * 파일삭제
-	 * @param filepath
-	 */
+	
+	public static void write(String filename, String data) throws IOException {
+		write(filename, data.getBytes());
+	}
+	
+	// FileChannel can be faster than standard IO
+	public static void write(String filename, byte[] data) throws IOException {
+		try (
+			RandomAccessFile stream = new RandomAccessFile(filename, "rw");
+			FileChannel channel = stream.getChannel();
+		) {
+		    ByteBuffer buffer = ByteBuffer.allocate(data.length);
+		    buffer.put(data);
+		    buffer.flip();
+		    channel.write(buffer);
+		}
+	}
+	
 	public static void deleteFile(String filepath) {
 		if(StringUtils.isEmpty(filepath)) return;
 		
@@ -251,15 +221,9 @@ public class FileUtils {
 			throw new FileNotFoundException(inFile.getPath());
 		}
 		
-		InputStream in = null;
-		try {
-			in = new FileInputStream(inFile);
+		try (InputStream in = new FileInputStream(inFile)) {
 			copy(in, out);
 		} finally {
-			if(null != in) {
-				closeSafe(in);
-			}
-			
 			try { out.flush(); } catch (IOException e) {}
 		}
 	}
@@ -269,9 +233,13 @@ public class FileUtils {
 	}
 	
 	public static int copy(InputStream in, OutputStream out) throws IOException {
+		assert null != in : "in must not null";
+		assert null != out : "out must not null";
+		
 		int total = 0;
 		
 		byte[] buf = new byte[BUFFER_SIZE];
+		
 		int n = 0;
 		while ((n = in.read(buf)) != -1) {
 			out.write(buf, 0, n);
@@ -282,16 +250,126 @@ public class FileUtils {
 		return total;
 	}
 	
-	public static void closeSafe(Closeable closeable) {
-		if(null == closeable) return;
-		try {
-			closeable.close();
-		} catch (IOException e) {
-		}
-	}
+//	public static void closeSafe(Closeable closeable) {
+//		if(null == closeable) return;
+//		try {
+//			closeable.close();
+//		} catch (IOException e) {
+//		}
+//	}
 	
 	public static String currentDir() {
 		return System.getProperty("user.dir");
+	}
+	
+	public static void mergeZipDiffFile(String original, String fetch, String output) {
+		mergeZipDiffFile(original, fetch, output, Charset.forName("EUC-KR"));
+	}
+	
+	public static void mergeZipDiffFile(String original, String fetch, String output, Charset charset) {
+		assert null != original && !original.isEmpty() : "orignal must not empty";
+		assert null != fetch && !fetch.isEmpty() : "fetch must not empty";
+		assert null != output && !output.isEmpty() : "output must not empty";
+		assert null != charset : "charset must not null";
+		
+		try (
+			ZipFile originalFile = new ZipFile(original, charset);
+			ZipFile fetchFile = new ZipFile(fetch, charset);
+		) {
+			Map<String, ZipEntry> originalFiles = DataUtils.map(originalFile.entries(), key->key.getName(), val->val);
+			Map<String, ZipEntry> fetchFiles = DataUtils.map(fetchFile.entries(), key->key.getName(), val->val);
+			
+			List<String> delFiles = new ArrayList<>();
+			List<String> modifyFiles = new ArrayList<>();
+			
+			for(String key : originalFiles.keySet()) {
+				// Check deleted file
+				if (!fetchFiles.containsKey(key)) {
+					delFiles.add(key);
+					continue;
+				}
+				
+				// Check modified file
+				if(!equals(originalFile.getInputStream(originalFiles.get(key)), originalFile.getInputStream(fetchFiles.get(key)))) {
+					modifyFiles.add(key);
+				}
+				
+				fetchFiles.remove(key);
+			}
+			
+			Set<String> newFiles = fetchFiles.keySet();
+			
+			try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(output))) {
+				byte[] buf = new byte[BUFFER_SIZE];
+				DataUtils.iterate(fetchFile.entries(), it->{
+					String name = it.getName();
+					if(!(newFiles.contains(name) || modifyFiles.contains(name))) return;
+					
+					ZipEntry zipEntry = new ZipEntry(name);
+					
+					try (InputStream in = fetchFile.getInputStream(it)) {
+						zipOut.putNextEntry(zipEntry);
+						
+						int len = 0;
+						while(0 != (len = read(in, buf))) {
+							zipOut.write(buf, 0, len);
+						}
+					} catch (IOException e) {
+						throw new RuntimeException("mergeDiffZipFile: outputZip", e);
+					}
+				});
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("mergeDiffZipFile: " + original, e);
+		}
+	}
+	
+	public static boolean equals(InputStream l, InputStream r) {
+		assert null != l : "l must not null";
+		assert null != r : "r must not null";
+		
+		byte[] lBuf = new byte[BUFFER_SIZE]; 
+		byte[] rBuf = new byte[BUFFER_SIZE];
+
+		int lLen = 0, rLen = 0;
+		try {
+			while(true) {
+				lLen = read(l, lBuf);
+				rLen = read(r, rBuf);
+				
+				if(0 == lLen || 0 == rLen) break;
+				if (lLen != rLen || !equals(lBuf, rBuf, lLen)) return false;
+			}
+		} catch  (IOException e) {
+			return false;
+		}
+		
+		return 0 == lLen && 0 == rLen;
+	}
+	
+	public static boolean equals(byte[] l, byte[] r, int size) {
+		assert l.length >= size : "length of l is greater than size";
+		assert r.length >= size : "length of r is greater than size";
+		
+		for(int i=0; i<size; ++i) {
+			if (l[i] != r[i]) return false;
+		}
+		
+		return true;
+	}
+	
+	public static int read(InputStream in, byte[] buf) throws IOException {
+		assert null != in : "in must not null";
+		assert null != buf : "buf must not null";
+		
+		int ret = 0;
+		
+		int n = 0;
+		while ((n = in.read(buf, ret, buf.length - ret)) != -1) {
+			ret += n;
+		}
+		
+		return ret;
 	}
 }
 

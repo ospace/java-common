@@ -1,14 +1,15 @@
 package com.tistory.ospace.common.util;
 
 import java.lang.reflect.Array;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -50,6 +51,14 @@ public class DataUtils {
 		for(T[] it: data) action.accept(it);
 	}
 	
+	public static <T> void iterate(Enumeration<T> data,  Consumer<T> action) {
+		if (null == data) return;
+		
+		while(data.hasMoreElements()) {
+			action.accept(data.nextElement());
+		}
+	}
+	
 	public static <T> void until(Collection<T> data, Predicate<T> action) {
 		if(isEmpty(data)) return;
 		
@@ -60,6 +69,15 @@ public class DataUtils {
 		if(isEmpty(data)) return;
 		
 		for(T it: data) if(action.test(it)) break;
+	}
+	
+	public static <T> void until(Enumeration<T> data, Predicate<T> action) {
+		if (null == data) return;
+		
+		while(data.hasMoreElements()) {
+			T it = data.nextElement();
+			if(action.test(it)) break;
+		}
 	}
 	
 	public static <T> T findFirst(Collection<T> data, Predicate<T> filter) {
@@ -75,14 +93,22 @@ public class DataUtils {
 	public static <T> T findFirst(T[] data, Predicate<T> filter) {
 		if (isEmpty(data)) return null;
 		
-		T tmpIt = null;
 		for(T it: data) {
-			if(filter.test(it)) {
-				tmpIt =  it; break;
-			}
+			if(filter.test(it)) return it;
 		}
 		
-		return tmpIt;
+		return null;
+	}
+	
+	public static <T> T findFirst(Enumeration<T> data, Predicate<T> filter) {
+		if (null == data) return null;
+		
+		while(data.hasMoreElements()) {
+			T it = data.nextElement();
+			if(filter.test(it)) return it;
+		}
+		
+		return null;
 	}
 
 	//필터 조건에 맞는 대상은 제거됨
@@ -101,6 +127,18 @@ public class DataUtils {
 		
 		List<T> ret = new ArrayList<>();
 		for(T it: data) if(!filter.test(it)) ret.add(it);
+		
+		return ret;
+	}
+	
+	public static <T> List<T> filter(Enumeration<T> data, Predicate<T> filter) {
+		if (null == data) return null;
+		
+		List<T> ret = new ArrayList<>();
+		while(data.hasMoreElements()) {
+			T it = data.nextElement();
+			if(!filter.test(it)) ret.add(it);
+		}
 		
 		return ret;
 	}
@@ -123,6 +161,17 @@ public class DataUtils {
 		return ret;
 	}
 	
+	public static <R, T> List<R> map(Enumeration<T> data, Function<T, R> action) {
+		if (null == data) return null;
+		
+		List<R> ret = new ArrayList<>();
+		while(data.hasMoreElements()) {
+			ret.add(action.apply(data.nextElement()));
+		}
+		
+		return ret;
+	}
+	
 	public static <K, V, T> Map<K,V> map(Collection<T> data, Function<T, K> key, Function<T, V> value) {
 		if (isEmpty(data)) return null;
 		
@@ -141,11 +190,23 @@ public class DataUtils {
 		return ret;
 	}
 	
-	public <T, R> List<R> map(Collection<T> data, Function<T, R> action, ExecutorService executor) {
+	public static <K, V, T> Map<K,V> map(Enumeration<T> data, Function<T, K> key, Function<T, V> value) {
+		if (null == data) return null;
+		
+		Map<K,V> ret = new HashMap<>();
+		while(data.hasMoreElements()) {
+			T it = data.nextElement();
+			ret.put(key.apply(it), value.apply(it));
+		}
+		
+		return ret;
+	}
+	
+	public static <T, R> List<R> map(Collection<T> data, Function<T, R> action, ExecutorService executor) {
 		return map(data, action, null, executor);
 	}
 	
-	public <T, R> List<R> map(Collection<T> data, Function<T, R> action, BiFunction<T, Throwable, R> except, ExecutorService executor) {
+	public static <T, R> List<R> map(Collection<T> data, Function<T, R> action, BiFunction<T, Throwable, R> except, ExecutorService executor) {
 		if (isEmpty(data)) return null;
 		
 		return allOf(map(data, it->createFuture(it, action, except, executor)));
@@ -157,6 +218,16 @@ public class DataUtils {
 	
 	public static <T, R> List<R> map(T[] data, Function<T, R> action, BiFunction<T, Throwable, R> except, ExecutorService executor) {
 		if (isEmpty(data)) return null;
+		
+		return allOf(map(data, it->createFuture(it, action, except, executor)));
+	}
+	
+	public static <T, R> List<R> map(Enumeration<T> data, Function<T, R> action, ExecutorService executor) {
+		return map(data, action, null, executor);
+	}
+	
+	public static <T, R> List<R> map(Enumeration<T> data, Function<T, R> action, BiFunction<T, Throwable, R> except, ExecutorService executor) {
+		if (null == data) return null;
 		
 		return allOf(map(data, it->createFuture(it, action, except, executor)));
 	}
@@ -204,6 +275,19 @@ public class DataUtils {
 		return ret;
 	}
 	
+	public static <K, T> Map<K, List<T>> partitioning(Enumeration<T> data, Function<T, K> key) {
+		if (null == data) return null;
+		
+		Map<K, List<T>> ret = new HashMap<>();
+		while(data.hasMoreElements()) {
+			T it = data.nextElement();
+			multimapAdd(ret, key.apply(it), it);
+		}
+		
+		
+		return ret;
+	}
+	
 	public static <K,T> void multimapAdd(Map<K, List<T>> data, K key, T value) {
 		List<T> found = data.get(key);
 		if(null == found) {
@@ -212,13 +296,6 @@ public class DataUtils {
 		found.add(value);
 	}
 
-	public static <R, T> R reduce(T[] data, BiConsumer<R,T> action, R init) {
-		if (isEmpty(data)) return init;
-		
-		for(T it: data) action.accept(init, it);
-		
-		return init;
-	}
 
 	public static <R, T> R reduce(Collection<T> data, BiConsumer<R,T> action, R init) {
 		if (isEmpty(data)) return init;
@@ -227,19 +304,51 @@ public class DataUtils {
 		return init;
 		
 	}
-
-	public static <R, T> R reduce(T[] data, BiFunction<R,T,R> action) {
-		if (isEmpty(data)) return null;
-		R ret = null;
-		for(T it: data) ret = action.apply(ret, it);
-		return ret;
+	
+	public static <R, T> R reduce(T[] data, BiConsumer<R,T> action, R init) {
+		if (isEmpty(data)) return init;
+		
+		for(T it: data) action.accept(init, it);
+		
+		return init;
 	}
+	
+	public static <R, T> R reduce(Enumeration<T> data, BiConsumer<R,T> action, R init) {
+		if (null == data) return init;
+		
+		while(data.hasMoreElements()) {
+			action.accept(init, data.nextElement());
+		}
+		
+		return init;
+	}
+	
 
 	public static <R, T> R reduce(Collection<T> data, BiFunction<R,T,R> action) {
 		if (isEmpty(data)) return null;
 		
 		R ret = null;
 		for(T it: data) ret = action.apply(ret, it);
+		
+		return ret;
+	}
+	
+	public static <R, T> R reduce(T[] data, BiFunction<R,T,R> action) {
+		if (isEmpty(data)) return null;
+		
+		R ret = null;
+		for(T it: data) ret = action.apply(ret, it);
+		
+		return ret;
+	}
+	
+	public static <R, T> R reduce(Enumeration<T> data, BiFunction<R,T,R> action) {
+		if (null == data) return null;
+		
+		R ret = null;
+		while(data.hasMoreElements()) {
+			ret = action.apply(ret, data.nextElement());
+		}
 		
 		return ret;
 	}
@@ -294,10 +403,6 @@ public class DataUtils {
 		}
 	}
 	
-	public static <T> int size(Collection<T> list) {
-		return isEmpty(list) ? 0 : list.size();
-	}
-	
 	public static <T> int maxSize(Collection<Collection<T>> list) {
 		if (isEmpty(list)) return 0;
 		int max_size = 0;
@@ -309,67 +414,29 @@ public class DataUtils {
 		return max_size;
 	}
 	
-	public static <P> P[] toArray(List<P> data) {
+	public static <P> P[] toArray(Collection<P> data) {
+		if(DataUtils.isEmpty(data)) return null;
+		
+		return toArray(data, data.iterator().next().getClass());
+	}
+	
+	public static <P> P[] toArray(Collection<P> data, Class<? extends Object> clazz) {
 		if(DataUtils.isEmpty(data)) return null;
 		
 		@SuppressWarnings("unchecked")
-		P[] ret = (P[]) Array.newInstance(data.get(0).getClass(), data.size());
+		P[] ret = (P[]) Array.newInstance(clazz, data.size());
 		data.toArray(ret);
 		
 		return ret;
 	}
 	
-	public static Integer min(Integer l, Integer r) {
-		if (null == l) return r;
-		if (null == r) return l;
+	public static List<LocalDate> range(LocalDate first, LocalDate last) {
+		List<LocalDate> ret = new ArrayList<>();
 		
-		return Math.min(l, r);
-	}
-	
-	final static int prime = 31;
-	public static int hashCode(Object ...args) {
-		if (DataUtils.isEmpty(args)) return 0;
-		
-		int result = 1;
-		for(Object each : args) {
-			result = prime * result + (null == each ? 0 : each.hashCode());
+		for(LocalDate it = first; it.isBefore(last); it=it.plusDays(1)) {
+		    ret.add(it);
 		}
 		
-		return result;
-	}
-	
-	public static <R, T> Integer sum(Collection<T> data, Function<T, Integer> action) {
-		return reduce(data, (ret, it) -> {
-			int val = action.apply(it);
-			return null == ret ? val : ret + val;
-		});
-	}
-	
-	public static <R, T> Integer min(Collection<T> data, Function<T, Integer> action) {
-		return reduce(data, (ret, it) -> {
-			int val = action.apply(it);
-			return null == ret ? val : Math.min(ret,  val);
-		});
-	}
-	
-	public static <R, T> Integer max(Collection<T> data, Function<T, Integer> action) {
-		return reduce(data, (ret, it) -> {
-			int val = action.apply(it);
-			return null == ret ? val : Math.max(ret,  val);
-		});
-	}
-
-	@SafeVarargs
-	public static <T> List<T> asList(T ...args) {
-		if(DataUtils.isEmpty(args)) return null;
-		if(1 == args.length && null == args[0]) return null;
-		
-		return Arrays.asList(args);
-	}
-
-	public static <P extends Comparable<P>> List<P> toSortedList(Set<P> data) {
-		List<P> ret = new ArrayList<>(data);
-		ret.sort((l,r)->l.compareTo(r));
 		return ret;
 	}
 }

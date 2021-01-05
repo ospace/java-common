@@ -3,16 +3,12 @@ package com.tistory.ospace.common.util;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 public class MathUtils {
 	public static final BigDecimal MINUS_ONE = new BigDecimal("-1");
-	
-	public static Integer min(Integer l, Integer r) {
-		if (null == l) return r;
-		if (null == r) return l;
-		return Math.min(l,r);
-	}
 	
 	public static BigDecimal add(BigDecimal... vals) {
 		return add(Arrays.asList(vals));
@@ -64,5 +60,33 @@ public class MathUtils {
 	
 	public static BigDecimal add(BigDecimal l, BigDecimal r, boolean isRate) {
 		return isRate ? addRate(l,r) : add(l,r);
+	}
+	
+	public static Integer min(Integer l, Integer r) {
+		if (null == l) return r;
+		if (null == r) return l;
+		
+		return Math.min(l, r);
+	}
+	
+	public static <R, T> Integer sum(Collection<T> data, Function<T, Integer> action) {
+		return DataUtils.reduce(data, (ret, it) -> {
+			int val = action.apply(it);
+			return null == ret ? val : ret + val;
+		});
+	}
+	
+	public static <R, T> Integer min(Collection<T> data, Function<T, Integer> action) {
+		return DataUtils.reduce(data, (ret, it) -> {
+			int val = action.apply(it);
+			return null == ret ? val : Math.min(ret,  val);
+		});
+	}
+	
+	public static <R, T> Integer max(Collection<T> data, Function<T, Integer> action) {
+		return DataUtils.reduce(data, (ret, it) -> {
+			int val = action.apply(it);
+			return null == ret ? val : Math.max(ret,  val);
+		});
 	}
 }

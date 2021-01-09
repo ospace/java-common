@@ -9,9 +9,9 @@ mvn -Dmaven.test.skip=true -DaltDeploymentRepository=snapshot::default::file:${L
 
 cd ${LOCAL_MAVEN_REPO}
 
-exit 0
 git status
 git add .
 git status
 git commit -m "version ${PROJECT_VERSION} of ${PROJECT_NAME}"
+git pull
 git push origin master

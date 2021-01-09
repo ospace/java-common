@@ -1,6 +1,6 @@
 package com.tistory.ospace.common.core;
 
-import com.tistory.ospace.common.util.StringUtils;
+import com.tistory.ospace.common.util.CmmUtils;
 
 public class BaseObject implements Cloneable {
 	@Override
@@ -15,6 +15,6 @@ public class BaseObject implements Cloneable {
 	
 	@Override
 	public String toString() {
-		return StringUtils.toJsonString(this);
+		return CmmUtils.toJsonString(this);
 	}
 }

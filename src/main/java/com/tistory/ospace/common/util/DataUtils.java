@@ -27,7 +27,15 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 public class DataUtils {
 	
-	public static <T> boolean isEmpty(Collection<T> obj) {
+	public static <P> boolean isEmpty(P[] obj) {
+		return (null == obj || 0 == obj.length);
+	}
+	
+	public static <P> boolean isEmpty(byte[] obj) {
+		return (null == obj || 0 == obj.length);
+	}
+	
+	public static <P> boolean isEmpty(Collection<P> obj) {
 		return (null == obj || obj.isEmpty());
 	}
 
@@ -35,29 +43,25 @@ public class DataUtils {
 		return (null == obj || obj.isEmpty());
 	}
 
-	public static <T> boolean isEmpty(T[] obj) {
-		return (null == obj || 0 == obj.length);
-	}
-	
-	public static <T> void iterate(Collection<T> data, Consumer<T> action) {
+	public static <P> void iterate(Collection<P> data, Consumer<P> action) {
 		if(isEmpty(data)) return;
 		
-		for(T it: data) action.accept(it);
+		for(P it: data) action.accept(it);
 	}
 
-	public static <T> void iterate(T[] data, Consumer<T> action) {
+	public static <P> void iterate(P[] data, Consumer<P> action) {
 		if (isEmpty(data)) return;
 		
-		for(T it: data) action.accept(it);
+		for(P it: data) action.accept(it);
 	}
 	
-	public static <T> void iterate(T[][] data, Consumer<T[]> action) {
+	public static <P> void iterate(P[][] data, Consumer<P[]> action) {
 		if (isEmpty(data)) return;
 		
-		for(T[] it: data) action.accept(it);
+		for(P[] it: data) action.accept(it);
 	}
 	
-	public static <T> void iterate(Enumeration<T> data,  Consumer<T> action) {
+	public static <P> void iterate(Enumeration<P> data,  Consumer<P> action) {
 		if (null == data) return;
 		
 		while(data.hasMoreElements()) {
@@ -65,52 +69,52 @@ public class DataUtils {
 		}
 	}
 	
-	public static <T> void until(Collection<T> data, Predicate<T> action) {
+	public static <P> void until(Collection<P> data, Predicate<P> action) {
 		if(isEmpty(data)) return;
 		
-		for(T it: data) if(action.test(it)) break;
+		for(P it: data) if(action.test(it)) break;
 	}
 	
-	public static <T> void until(T[] data, Predicate<T> action) {
+	public static <P> void until(P[] data, Predicate<P> action) {
 		if(isEmpty(data)) return;
 		
-		for(T it: data) if(action.test(it)) break;
+		for(P it: data) if(action.test(it)) break;
 	}
 	
-	public static <T> void until(Enumeration<T> data, Predicate<T> action) {
+	public static <P> void until(Enumeration<P> data, Predicate<P> action) {
 		if (null == data) return;
 		
 		while(data.hasMoreElements()) {
-			T it = data.nextElement();
+			P it = data.nextElement();
 			if(action.test(it)) break;
 		}
 	}
 	
-	public static <T> T findFirst(Collection<T> data, Predicate<T> filter) {
+	public static <P> P findFirst(Collection<P> data, Predicate<P> filter) {
 		if (isEmpty(data)) return null;
 		
-		for(T it: data) {
+		for(P it: data) {
 			if(filter.test(it)) return it;
 		}
 		
 		return null;
 	}
 
-	public static <T> T findFirst(T[] data, Predicate<T> filter) {
+	public static <P> P findFirst(P[] data, Predicate<P> filter) {
 		if (isEmpty(data)) return null;
 		
-		for(T it: data) {
+		for(P it: data) {
 			if(filter.test(it)) return it;
 		}
 		
 		return null;
 	}
 	
-	public static <T> T findFirst(Enumeration<T> data, Predicate<T> filter) {
+	public static <P> P findFirst(Enumeration<P> data, Predicate<P> filter) {
 		if (null == data) return null;
 		
 		while(data.hasMoreElements()) {
-			T it = data.nextElement();
+			P it = data.nextElement();
 			if(filter.test(it)) return it;
 		}
 		
@@ -118,56 +122,56 @@ public class DataUtils {
 	}
 
 	//필터 조건에 맞는 대상은 제거됨
-	public static <T> List<T> filter(Collection<T> data, Predicate<T> filter) {
+	public static <P> List<P> filter(Collection<P> data, Predicate<P> filter) {
 		if (isEmpty(data)) return null;
 		
-		List<T> ret = new ArrayList<>();
-		for(T it: data) if(!filter.test(it)) ret.add(it);
+		List<P> ret = new ArrayList<>();
+		for(P it: data) if(!filter.test(it)) ret.add(it);
 		
 		return ret;
 	}
 
 	//필터 조건에 맞는 대상은 제거됨
-	public static <T> List<T> filter(T[] data, Predicate<T> filter) {
+	public static <P> List<P> filter(P[] data, Predicate<P> filter) {
 		if (isEmpty(data)) return null;
 		
-		List<T> ret = new ArrayList<>();
-		for(T it: data) if(!filter.test(it)) ret.add(it);
+		List<P> ret = new ArrayList<>();
+		for(P it: data) if(!filter.test(it)) ret.add(it);
 		
 		return ret;
 	}
 	
-	public static <T> List<T> filter(Enumeration<T> data, Predicate<T> filter) {
+	public static <P> List<P> filter(Enumeration<P> data, Predicate<P> filter) {
 		if (null == data) return null;
 		
-		List<T> ret = new ArrayList<>();
+		List<P> ret = new ArrayList<>();
 		while(data.hasMoreElements()) {
-			T it = data.nextElement();
+			P it = data.nextElement();
 			if(!filter.test(it)) ret.add(it);
 		}
 		
 		return ret;
 	}
 
-	public static <R, T> List<R> map(Collection<T> data, Function<T, R> action) {
+	public static <R, P> List<R> map(Collection<P> data, Function<P, R> action) {
 		if (isEmpty(data)) return null;
 		
 		List<R> ret = new ArrayList<>();
-		for(T it: data) ret.add(action.apply(it));
+		for(P it: data) ret.add(action.apply(it));
 		
 		return ret;
 	}
 
-	public static <R, T> List<R> map(T[] data, Function<T, R> action) {
+	public static <R, P> List<R> map(P[] data, Function<P, R> action) {
 		if (isEmpty(data)) return null;
 		
 		List<R> ret = new ArrayList<>();
-		for(T it: data) ret.add(action.apply(it));
+		for(P it: data) ret.add(action.apply(it));
 		
 		return ret;
 	}
 	
-	public static <R, T> List<R> map(Enumeration<T> data, Function<T, R> action) {
+	public static <R, P> List<R> map(Enumeration<P> data, Function<P, R> action) {
 		if (null == data) return null;
 		
 		List<R> ret = new ArrayList<>();
@@ -178,67 +182,67 @@ public class DataUtils {
 		return ret;
 	}
 	
-	public static <K, V, T> Map<K,V> map(Collection<T> data, Function<T, K> key, Function<T, V> value) {
+	public static <K, V, P> Map<K,V> map(Collection<P> data, Function<P, K> key, Function<P, V> value) {
 		if (isEmpty(data)) return null;
 		
 		Map<K,V> ret = new HashMap<>();
-		for(T it: data) ret.put(key.apply(it), value.apply(it));
+		for(P it: data) ret.put(key.apply(it), value.apply(it));
 		
 		return ret;
 	}
 
-	public static <K, V, T> Map<K,V> map(T[] data, Function<T, K> key, Function<T, V> value) {
+	public static <K, V, P> Map<K,V> map(P[] data, Function<P, K> key, Function<P, V> value) {
 		if (isEmpty(data)) return null;
 		
 		Map<K,V> ret = new HashMap<>();
-		for(T it: data) ret.put(key.apply(it), value.apply(it));
+		for(P it: data) ret.put(key.apply(it), value.apply(it));
 		
 		return ret;
 	}
 	
-	public static <K, V, T> Map<K,V> map(Enumeration<T> data, Function<T, K> key, Function<T, V> value) {
+	public static <K, V, P> Map<K,V> map(Enumeration<P> data, Function<P, K> key, Function<P, V> value) {
 		if (null == data) return null;
 		
 		Map<K,V> ret = new HashMap<>();
 		while(data.hasMoreElements()) {
-			T it = data.nextElement();
+			P it = data.nextElement();
 			ret.put(key.apply(it), value.apply(it));
 		}
 		
 		return ret;
 	}
 	
-	public static <T, R> List<R> map(Collection<T> data, Function<T, R> action, ExecutorService executor) {
+	public static <R, P> List<R> map(Collection<P> data, Function<P, R> action, ExecutorService executor) {
 		return map(data, action, null, executor);
 	}
 	
-	public static <T, R> List<R> map(Collection<T> data, Function<T, R> action, BiFunction<T, Throwable, R> except, ExecutorService executor) {
+	public static <R, P> List<R> map(Collection<P> data, Function<P, R> action, BiFunction<P, Throwable, R> except, ExecutorService executor) {
 		if (isEmpty(data)) return null;
 		
 		return allOf(map(data, it->createFuture(it, action, except, executor)));
 	}
 	
-	public static <T, R> List<R> map(T[] data, Function<T, R> action, ExecutorService executor) {
+	public static <R, P> List<R> map(P[] data, Function<P, R> action, ExecutorService executor) {
 		return map(data, action, null, executor);
 	}
 	
-	public static <T, R> List<R> map(T[] data, Function<T, R> action, BiFunction<T, Throwable, R> except, ExecutorService executor) {
+	public static <R, P> List<R> map(P[] data, Function<P, R> action, BiFunction<P, Throwable, R> except, ExecutorService executor) {
 		if (isEmpty(data)) return null;
 		
 		return allOf(map(data, it->createFuture(it, action, except, executor)));
 	}
 	
-	public static <T, R> List<R> map(Enumeration<T> data, Function<T, R> action, ExecutorService executor) {
+	public static <R, P> List<R> map(Enumeration<P> data, Function<P, R> action, ExecutorService executor) {
 		return map(data, action, null, executor);
 	}
 	
-	public static <T, R> List<R> map(Enumeration<T> data, Function<T, R> action, BiFunction<T, Throwable, R> except, ExecutorService executor) {
+	public static <R, P> List<R> map(Enumeration<P> data, Function<P, R> action, BiFunction<P, Throwable, R> except, ExecutorService executor) {
 		if (null == data) return null;
 		
 		return allOf(map(data, it->createFuture(it, action, except, executor)));
 	}
 	
-	public static <T,R> CompletableFuture<R> createFuture(T item, Function<T, R> action, BiFunction<T, Throwable, R> except, ExecutorService executor) {
+	public static <P,R> CompletableFuture<R> createFuture(P item, Function<P, R> action, BiFunction<P, Throwable, R> except, ExecutorService executor) {
 		// RequestAttributes atts = RequestContextHolder.getRequestAttributes();
 		return CompletableFuture.supplyAsync(()->{
 			// RequestContextHolder.setRequestAttributes(atts);
@@ -263,30 +267,30 @@ public class DataUtils {
 		return result;
 	}
 	
-	public static <K, T> Map<K, List<T>> partitioning(Collection<T> data, Function<T, K> key) {
+	public static <K, P> Map<K, List<P>> partitioning(Collection<P> data, Function<P, K> key) {
 		if (isEmpty(data)) return null;
 		
-		Map<K, List<T>> ret = new HashMap<>();
-		for(T it: data) multimapAdd(ret, key.apply(it), it);
+		Map<K, List<P>> ret = new HashMap<>();
+		for(P it: data) multimapAdd(ret, key.apply(it), it);
 		
 		return ret;
 	}
 	
-	public static <K, T> Map<K, List<T>> partitioning(T[] data, Function<T, K> key) {
+	public static <K, P> Map<K, List<P>> partitioning(P[] data, Function<P, K> key) {
 		if (isEmpty(data)) return null;
 		
-		Map<K, List<T>> ret = new HashMap<>();
-		for(T it: data) multimapAdd(ret, key.apply(it), it);
+		Map<K, List<P>> ret = new HashMap<>();
+		for(P it: data) multimapAdd(ret, key.apply(it), it);
 		
 		return ret;
 	}
 	
-	public static <K, T> Map<K, List<T>> partitioning(Enumeration<T> data, Function<T, K> key) {
+	public static <K, P> Map<K, List<P>> partitioning(Enumeration<P> data, Function<P, K> key) {
 		if (null == data) return null;
 		
-		Map<K, List<T>> ret = new HashMap<>();
+		Map<K, List<P>> ret = new HashMap<>();
 		while(data.hasMoreElements()) {
-			T it = data.nextElement();
+			P it = data.nextElement();
 			multimapAdd(ret, key.apply(it), it);
 		}
 		
@@ -294,8 +298,8 @@ public class DataUtils {
 		return ret;
 	}
 	
-	public static <K,T> void multimapAdd(Map<K, List<T>> data, K key, T value) {
-		List<T> found = data.get(key);
+	public static <K,P> void multimapAdd(Map<K, List<P>> data, K key, P value) {
+		List<P> found = data.get(key);
 		if(null == found) {
 			data.put(key, found = new ArrayList<>());
 		}
@@ -303,23 +307,23 @@ public class DataUtils {
 	}
 
 
-	public static <R, T> R reduce(Collection<T> data, BiConsumer<R,T> action, R init) {
+	public static <R, P> R reduce(Collection<P> data, BiConsumer<R, P> action, R init) {
 		if (isEmpty(data)) return init;
 		
-		for(T it: data) action.accept(init, it);
+		for(P it: data) action.accept(init, it);
 		return init;
 		
 	}
 	
-	public static <R, T> R reduce(T[] data, BiConsumer<R,T> action, R init) {
+	public static <R, P> R reduce(P[] data, BiConsumer<R, P> action, R init) {
 		if (isEmpty(data)) return init;
 		
-		for(T it: data) action.accept(init, it);
+		for(P it: data) action.accept(init, it);
 		
 		return init;
 	}
 	
-	public static <R, T> R reduce(Enumeration<T> data, BiConsumer<R,T> action, R init) {
+	public static <R, P> R reduce(Enumeration<P> data, BiConsumer<R, P> action, R init) {
 		if (null == data) return init;
 		
 		while(data.hasMoreElements()) {
@@ -330,25 +334,25 @@ public class DataUtils {
 	}
 	
 
-	public static <R, T> R reduce(Collection<T> data, BiFunction<R,T,R> action) {
+	public static <R, P> R reduce(Collection<P> data, BiFunction<R, P, R> action) {
 		if (isEmpty(data)) return null;
 		
 		R ret = null;
-		for(T it: data) ret = action.apply(ret, it);
+		for(P it: data) ret = action.apply(ret, it);
 		
 		return ret;
 	}
 	
-	public static <R, T> R reduce(T[] data, BiFunction<R,T,R> action) {
+	public static <R, P> R reduce(P[] data, BiFunction<R, P, R> action) {
 		if (isEmpty(data)) return null;
 		
 		R ret = null;
-		for(T it: data) ret = action.apply(ret, it);
+		for(P it: data) ret = action.apply(ret, it);
 		
 		return ret;
 	}
 	
-	public static <R, T> R reduce(Enumeration<T> data, BiFunction<R,T,R> action) {
+	public static <R, P> R reduce(Enumeration<P> data, BiFunction<R, P, R> action) {
 		if (null == data) return null;
 		
 		R ret = null;
@@ -359,11 +363,11 @@ public class DataUtils {
 		return ret;
 	}
 
-	public static <T> Collection<Collection<T>> combination(Collection<Collection<T>> dataSet) {
+	public static <P> Collection<Collection<P>> combination(Collection<Collection<P>> dataSet) {
 		return reduce(dataSet, DataUtils::combination);
 	}
 
-	public static <T> Collection<Collection<T>> combination(Collection<Collection<T>> ret, Collection<T> values) {
+	public static <P> Collection<Collection<P>> combination(Collection<Collection<P>> ret, Collection<P> values) {
 		if(isEmpty(ret)) {
 			return reduce(values, (r,v)->r.add(new ArrayList<>(Arrays.asList(v))), new ArrayList<>());
 		}
@@ -371,48 +375,48 @@ public class DataUtils {
 		return reduce(ret, (r,d)->iterate(values, v->r.add(add(d, v))), new ArrayList<>());
 	}
 
-	public static <T> List<List<T>> transform(Collection<Collection<T>> dataSet) {
+	public static <P> List<List<P>> transform(Collection<Collection<P>> dataSet) {
 		int max_size = maxSize(dataSet);
-		List<List<T>> ret = new ArrayList<>();
+		List<List<P>> ret = new ArrayList<>();
 		for(int i=0; i<max_size; ++i) ret.add(new ArrayList<>());
 		
-		for(Collection<T> it : dataSet) {
+		for(Collection<P> it : dataSet) {
 			zip(ret, it, (r,v)->r.add(v));
 		}
 		
 		return ret;
 	}
 
-	public static <T> List<T> add(Collection<T> l, T r) {
-		List<T> ret = new ArrayList<>(l);
+	public static <P> List<P> add(Collection<P> l, P r) {
+		List<P> ret = new ArrayList<>(l);
 		ret.add(r);
 		
 		return ret;
 	}
 
-	public static <T> List<T> add(List<T> l, List<T> r) {
+	public static <P> List<P> add(List<P> l, List<P> r) {
 		if (isEmpty(l)) return r;
 		if (isEmpty(r)) return l;
 		
-		List<T> ret = new ArrayList<>(l);
+		List<P> ret = new ArrayList<>(l);
 		ret.addAll(r);
 		
 		return ret;
 	}
 
-	public static <T,U> void zip(Collection<T> data1, Collection<U> data2, BiConsumer<T,U> action) {
+	public static <P, U> void zip(Collection<P> data1, Collection<U> data2, BiConsumer<P, U> action) {
 		if (isEmpty(data1) || isEmpty(data2)) return;
-		Iterator<T> it1 = data1.iterator();
+		Iterator<P> it1 = data1.iterator();
 		Iterator<U> it2 = data2.iterator();
 		while(it1.hasNext() && it2.hasNext()) {
 			action.accept(it1.next(), it2.next());
 		}
 	}
 	
-	public static <T> int maxSize(Collection<Collection<T>> list) {
+	public static <P> int maxSize(Collection<Collection<P>> list) {
 		if (isEmpty(list)) return 0;
 		int max_size = 0;
-		for(Collection<T> it : list) {
+		for(Collection<P> it : list) {
 			if(null == it) continue;
 			max_size = Math.max(max_size, it.size());
 		}
@@ -444,6 +448,32 @@ public class DataUtils {
 		}
 		
 		return ret;
+	}
+	
+	public static <P> boolean contains(P[] data, P val) {
+		if (isEmpty(data)) return false;
+		
+		for(P it : data) {
+			if (it.equals(val)) return true;
+		}
+		
+		return false;
+	}
+	
+	public static <P> boolean contains(Collection<P> data, P val) {
+		if (isEmpty(data)) return false;
+		
+		return data.contains(val);
+	}
+	
+	public static <P> boolean contains(Enumeration<P> data, P val) {
+		if( null == data || !data.hasMoreElements()) return false;
+		
+		while(data.hasMoreElements()) {
+			if (data.nextElement().equals(val)) return true;
+		}
+		
+		return false;
 	}
 
 	/* mapping 구조

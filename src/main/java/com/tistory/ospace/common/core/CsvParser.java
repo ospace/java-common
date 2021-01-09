@@ -7,7 +7,7 @@ import java.io.OutputStream;
  * 
  */
 public class CsvParser {
-	private static final char CR = '\n';
+	//private static final char CR = '\n';
 	private static final char SEP = ',';
 
 	private byte[] data;

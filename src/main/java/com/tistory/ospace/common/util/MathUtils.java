@@ -37,6 +37,10 @@ public class MathUtils {
 		return null == val ? null : BigDecimal.valueOf(val.setScale(0, BigDecimal.ROUND_UP).longValue());
 	}
 	
+	public static Integer add(Integer l, Integer r) {
+		return null == r ? l : (null == l ? r : l + r);
+	}
+	
 	public static BigDecimal add(BigDecimal l, BigDecimal r) {
 		return null == r ? l : (null == l ? r : l.add(r));
 	}
@@ -69,24 +73,43 @@ public class MathUtils {
 		return Math.min(l, r);
 	}
 	
-	public static <R, T> Integer sum(Collection<T> data, Function<T, Integer> action) {
-		return DataUtils.reduce(data, (ret, it) -> {
-			int val = action.apply(it);
-			return null == ret ? val : ret + val;
-		});
+	public static <P> Integer sum(Collection<P> data, Function<P, Integer> action) {
+		return DataUtils.reduce(data, (n,i)->add(n, action.apply(i)));
 	}
 	
-	public static <R, T> Integer min(Collection<T> data, Function<T, Integer> action) {
+	public static <P> BigDecimal sumOfBigDecimal(Collection<P> data, Function<P, BigDecimal> action) {
+		return DataUtils.reduce(data, (n,i)->add(n, action.apply(i)));
+	}
+	
+	public static <T> Integer min(Collection<T> data, Function<T, Integer> action) {
 		return DataUtils.reduce(data, (ret, it) -> {
 			int val = action.apply(it);
 			return null == ret ? val : Math.min(ret,  val);
 		});
 	}
 	
-	public static <R, T> Integer max(Collection<T> data, Function<T, Integer> action) {
+	public static <T> Integer max(Collection<T> data, Function<T, Integer> action) {
 		return DataUtils.reduce(data, (ret, it) -> {
 			int val = action.apply(it);
 			return null == ret ? val : Math.max(ret,  val);
 		});
+	}
+	
+	public static Integer parseInt(String str) {
+	    return parseInt(str, null);
+	}
+	
+	public static Integer parseInt(String str, Integer defaultVal) {
+		if(StringUtils.isEmpty(str)) return defaultVal;
+		
+		Integer ret = null;
+		
+		try {
+			ret = Integer.parseInt(str);
+		} catch(NumberFormatException e) {
+			ret = defaultVal;
+		}
+		
+		return ret;
 	}
 }

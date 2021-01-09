@@ -17,11 +17,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
+import java.io.Reader;
 import java.io.Writer;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -39,6 +42,15 @@ import java.util.zip.ZipOutputStream;
 public class FileUtils {
 	public static final int BUFFER_SIZE = 4*1024;
 
+	/**
+	 * 이미지 리사이징
+	 * @param originalFile
+	 * @param thumbnailFile
+	 * @param thumbWidth
+	 * @param thumbHeight
+	 * @param quality
+	 * @throws Exception
+	 */
 	public static void makeThumbNail(String originalFile, String thumbnailFile, int thumbWidth, int thumbHeight) throws Exception{
 		
 		Image image = javax.imageio.ImageIO.read(new File(originalFile));
@@ -75,6 +87,11 @@ public class FileUtils {
 		       
 	}
 	
+	/***
+	 * 파일 사이즈
+	 * @param file
+	 * @return String
+	 */
 	public static  String getFileSize(Long size){	
 		if (size <= 0)	return "0";
 		
@@ -83,6 +100,12 @@ public class FileUtils {
 		return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 	
+	/***
+	 * 파일읽기
+	 * @param path : 파일경로
+	 * @param filename : 파일명
+	 * @return
+	 */
 	public static String getFileRead(String path, String filename) {
 		
 		StringBuffer dataList = new StringBuffer();
@@ -100,6 +123,11 @@ public class FileUtils {
 		return dataList.toString();
 	}
 		
+	/***
+	 * 파일쓰기
+	 * @param str : 파일내용
+	 * @param filename : 파일명(경로포함)
+	 */
 	public static void setFileWrite(String str, String filename, String charset) { 
 		
 		
@@ -128,6 +156,32 @@ public class FileUtils {
 		}
 		
 		return sb.toString();
+	}
+	
+	public static String readResource(String filepath) throws IOException {
+		return readResource(filepath, "UTF8");
+	}
+	
+	public static String readResource(String filepath, String charset) throws IOException {
+		InputStream fis = null;
+		Reader reader = null;
+		BufferedReader br = null;
+		try {
+			fis = CmmUtils.class.getClassLoader().getResourceAsStream(filepath);
+			reader = new InputStreamReader(fis, charset);
+			br = new BufferedReader(reader);
+			StringBuilder sb = new StringBuilder();
+		    CharBuffer cbuf = CharBuffer.allocate(1024);
+	    	while(0 < br.read(cbuf)) {		    	
+		    	cbuf.flip();
+		    	sb.append(cbuf);
+		    }
+		    return sb.toString();
+		} finally {
+			if(null != br)     br.close();
+			if(null != reader) reader.close();
+			if(null != fis)    fis.close();
+		}
 	}
 	
 	public static boolean writeString(String filepath, String data) {
@@ -194,6 +248,10 @@ public class FileUtils {
 		}
 	}
 	
+	/**
+	 * 파일삭제
+	 * @param filepath
+	 */
 	public static void deleteFile(String filepath) {
 		if(StringUtils.isEmpty(filepath)) return;
 		
@@ -250,14 +308,6 @@ public class FileUtils {
 		
 		return total;
 	}
-	
-//	public static void closeSafe(Closeable closeable) {
-//		if(null == closeable) return;
-//		try {
-//			closeable.close();
-//		} catch (IOException e) {
-//		}
-//	}
 	
 	public static String currentDir() {
 		return System.getProperty("user.dir");

@@ -3,6 +3,7 @@ package com.tistory.ospace.common.util;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.Reference;
 import java.lang.reflect.Array;
@@ -23,6 +24,15 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.reflections.Reflections;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class CmmUtils {
 	public static <T> T isNull(T value, T init) {
@@ -355,5 +365,122 @@ public class CmmUtils {
 		new Random().nextBytes(ret);
 		
 		return ret;
+	}
+    
+    /** 개인정보 마스킹 패턴(XML과 JSON 문자열에서 함께 사용) */
+	private static String[] regExpPatterns = {
+		"(Phone>|Phone\":\")\\d{9,16}", 
+		"(mobile\":\")\\d{9,16}", 
+		"(FirstName>|firstName\":\")[a-zA-Z ]+", 
+		"(DOB>|birthday\":\")[\\d-]+", 
+		"(PostalCode>|post\":\")\\d{4,16}", 
+		"(EmailAddress>|email\":\")[\\w.%+-]+@[\\w.]+\\.[a-zA-Z]{2,6}", 
+		"(AddressLine1>|addressLine1\":\"|address\":\")[\\w ,+\\-]+", 
+		"(AddressLine2>|addressLine2\":\")[\\w ,+\\-]+", 
+		"(AddressLine3>|addressLine3\":\")[\\w ,+\\-]+", 
+		"(DocNumber>|docNumber\":\")[\\w]+"
+	};
+	
+	//개인정보 마스킹 2-1(로그), 개인정보 마스킹 2-2(VO객체 - BookingVO, BookingContactVO 등 toString 을 @Override 함)
+	public static String toMaskPersonalInfo(String str) {
+		String temp = str; 
+		for(String reg : regExpPatterns) {
+			temp = temp.replaceAll(reg, "$1***");
+		}
+		
+		return temp;
+	}
+
+	private static final ObjectMapper jsonFieldObjectMapper = new ObjectMapper()
+			.setSerializationInclusion(Include.NON_NULL)
+			.setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
+			.setVisibility(PropertyAccessor.GETTER, Visibility.NONE)
+			.setVisibility(PropertyAccessor.CREATOR, Visibility.NONE)
+			.registerModule(new JavaTimeModule());
+	
+	public static <T> String toFieldJsonString(T obj) {
+		try {
+			return CmmUtils.jsonFieldObjectMapper.writeValueAsString(obj);
+		} catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+	        return e.getMessage();
+	    }
+	}
+
+	private static final ObjectMapper jsonSimpleObjectMapper = new ObjectMapper()
+			.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+			.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES) //없는 프로퍼티를 매핑 에러 처리
+			.enable(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT)
+			.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT) //프로퍼티에 빈문자열을 NULL로 매핑
+			.registerModule(new JavaTimeModule())
+			.setSerializationInclusion(Include.NON_NULL);
+		
+	public static <T> String toJsonString(T obj, boolean isPretty) {
+		try {
+			if (isPretty) {
+				return jsonSimpleObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+			} else {
+				return jsonSimpleObjectMapper.writeValueAsString(obj);
+			}
+	    } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+	        return e.getMessage();
+	    }
+	}
+
+	public static <T> String toJsonString(T obj) {
+		return toJsonString(obj, false);
+	}
+	
+	public static JsonNode toJsonNode(String jsonStr) {
+		try {
+			return jsonSimpleObjectMapper.readTree(jsonStr);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static <R> R toObject(String jsonStr, Class<R> clazz) {
+		if(null == jsonStr) return null;
+		
+		try {
+			return jsonSimpleObjectMapper.readValue(jsonStr, clazz);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static <R> R toObject(Map<String, Object> from, R to) {
+		assert null != from : "from must not null";
+		assert null != to : "to must not null";
+		
+		PropertyDescriptor[] properties = getPropertyDescriptors(to.getClass());
+		
+		for(PropertyDescriptor property : properties) {
+			String name = property.getName();
+			if (!from.containsKey(name)) continue;
+			Object value = from.get(name);
+			
+			Method setterMethod = property.getWriteMethod();
+			Class<?> setterClass = setterMethod.getParameterTypes()[0];
+			
+			if(null != value  && isAssignable(value.getClass(), setterClass)) {
+				continue;
+			}
+			
+			try {
+				setterMethod.invoke(to, value);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new RuntimeException("toObject invoke " + name, e);
+			}
+		}
+		
+		return to;
+	}
+	
+	private final static String AUTH_REMOATEADDRS =
+			"|0:0:0:0:0:0:0:1|127.0.0.1|0.0.0.1|211.202.25.242|1.214.218.218|";
+	
+	public static boolean isLocalAddress(String ipAddr) {
+	    return -1 < AUTH_REMOATEADDRS.indexOf(ipAddr);
 	}
 }

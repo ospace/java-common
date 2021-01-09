@@ -219,7 +219,6 @@ public class StringUtils {
 	
 	/**
 	 * 숫자 체크
-	 * @param pattern
 	 * @param str
 	 * @return
 	 */

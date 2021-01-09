@@ -48,7 +48,6 @@ public class FileUtils {
 	 * @param thumbnailFile
 	 * @param thumbWidth
 	 * @param thumbHeight
-	 * @param quality
 	 * @throws Exception
 	 */
 	public static void makeThumbNail(String originalFile, String thumbnailFile, int thumbWidth, int thumbHeight) throws Exception{
@@ -89,7 +88,7 @@ public class FileUtils {
 	
 	/***
 	 * 파일 사이즈
-	 * @param file
+	 * @param size
 	 * @return String
 	 */
 	public static  String getFileSize(Long size){	

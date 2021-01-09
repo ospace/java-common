@@ -31,6 +31,7 @@ public class DateUtils {
 	
 	/**
 	 * String convert to ZonedDateTime
+	 * 
 	 * @param dateStr
 	 * @param standardZone
 	 * @param changeZone
@@ -68,18 +69,8 @@ public class DateUtils {
 	}
 	
 	/**
-	 * Builder를 넘겨주지 않는 경우 default로 선언 해놓은 DateTimeFormatterBuilder 사용
-	 * @param dateStr
-	 * @return
-	 */
-//	public static ZonedDateTime toDateTime(String dateStr) {
-//		if (StringUtils.isEmpty(dateStr)) return null;
-//		ZonedDateTime date = toDateTIme(dateStr, LOCAL);
-//		return date;
-//	}
-	
-	/**
 	 * Calendar convert to ZonedDateTime
+	 * 
 	 * @param calendar
 	 * @return
 	 */
@@ -103,6 +94,7 @@ public class DateUtils {
 	
 	/**
 	 * Millisecond convert to ZonedDateTime
+	 * 
 	 * @param tms
 	 * @return
 	 */
@@ -112,6 +104,7 @@ public class DateUtils {
 	
     /**
 	 * ZonedDateTime convert to String with pattern
+	 * 
 	 * @param date
 	 * @param pattern
 	 * @return
@@ -128,6 +121,7 @@ public class DateUtils {
 	
 	/**
 	 * LocalTime convert to String
+	 * 
 	 * @param time
 	 * @param pattern
 	 * @return
@@ -154,6 +148,7 @@ public class DateUtils {
     
     /**
      * LocalDateTime convert to String
+     * 
      * @param date
      * @param pattern
      * @return
@@ -170,6 +165,7 @@ public class DateUtils {
 	
     /**
      * String convert to LocalDateTime with pattern
+     * 
      * @param date
      * @param pattern
      * @return
@@ -206,6 +202,7 @@ public class DateUtils {
 	/**
 	 * 요일명 가져오기
 	 * locale parameter 넘겨줄 시 해당 locale의 요일명으로 반환
+	 * 
 	 * @param date
 	 * @param locale
 	 * @return
@@ -219,6 +216,7 @@ public class DateUtils {
 	
 	/**
 	 * get today
+	 * 
 	 * @return
 	 */
 	public static ZonedDateTime now() {
@@ -235,6 +233,7 @@ public class DateUtils {
 	
 	/**
 	 * 날짜 기준으로 생일을 적용하여 나이를 계산
+	 * 
 	 * @param birthday
 	 * @param current
 	 * @return int
@@ -245,6 +244,7 @@ public class DateUtils {
 	
 	/**
 	 * get difference of days
+	 * 
 	 * @param start
 	 * @param end
 	 * @return
@@ -255,6 +255,7 @@ public class DateUtils {
 	
 	/**
 	 * get difference of hours
+	 * 
 	 * @param start
 	 * @param end
 	 * @return
@@ -265,6 +266,7 @@ public class DateUtils {
 	
 	/**
 	 * get difference of minutes
+	 * 
 	 * @param start
 	 * @param end
 	 * @return
@@ -275,6 +277,7 @@ public class DateUtils {
 	
 	/**
 	 * get difference of seconds
+	 * 
 	 * @param start
 	 * @param end
 	 * @return
@@ -297,6 +300,7 @@ public class DateUtils {
 	
 	/**
 	 * 입력받은 시간(분) 정보로 ZoneId 반환
+	 * 
 	 * @param minutes
 	 * @return
 	 */
@@ -319,6 +323,7 @@ public class DateUtils {
 
 	/***
      * 초단위를 문자열로 변환. 
+     * 
      * @param sec : 초
      * @param fmt : 포멧팅 문자열({0}: day, {1}: hour, {2}: min, {3}: sec)
      * @return String
@@ -341,6 +346,7 @@ public class DateUtils {
 	
 	/**
      * 현재 년
+     * 
      * @return int
      */
     public static int getYear()  {
@@ -349,6 +355,7 @@ public class DateUtils {
     
     /***
      * 현재 월
+     * 
      * @return int
      */
     public static int getMonth() {
@@ -357,6 +364,7 @@ public class DateUtils {
     
     /***
      * 현재 일
+     * 
      * @return int
      */
     public static int getDay() {
@@ -365,6 +373,7 @@ public class DateUtils {
     
     /***
      * 현재 요일
+     * 
      * @return String
      */
     public static String getWeek() {
@@ -378,6 +387,7 @@ public class DateUtils {
     
     /***
      * 현재달 주 (1주, 2주 ...)
+     * 
      * @return int
      */
     public static int getCurrentWeek(){
@@ -388,6 +398,7 @@ public class DateUtils {
     
     /***
      * 해당년월의 마지막 날짜
+     * 
      * @param nYear : 년도
      * @param nMonth : 월
      * @return int
@@ -400,6 +411,7 @@ public class DateUtils {
     
     /***
      * 해당년월의 첫번째 날짜의 요일(1:SUNDAY, 2:MONDAY...)
+     * 
      * @param nYear
      * @param nMonth
      * @return int
@@ -412,6 +424,7 @@ public class DateUtils {
     
     /***
      * 해당년월의 주의 개수
+     * 
      * @param nFristWeekday : 그 달의 첫째날의 요일
      * @param nToDay : 그 달의 날짜 수
      * @return int

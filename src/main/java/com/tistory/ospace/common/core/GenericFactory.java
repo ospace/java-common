@@ -1,4 +1,4 @@
-package com.tistory.ospace.common.util;
+package com.tistory.ospace.common.core;
 
 public class GenericFactory<T> {
 	private Class<T> clazz;

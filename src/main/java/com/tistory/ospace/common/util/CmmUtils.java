@@ -3,6 +3,7 @@ package com.tistory.ospace.common.util;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.Reference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -10,12 +11,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -222,5 +225,135 @@ public class CmmUtils {
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("getClassByName: " + className, e);
 		}
+	}
+	
+	public static String generateQRCode(String data) {
+		try {
+			String encodedData = URLEncoder.encode(data, "UTF-8");
+			
+			//return String.format("https://www.google.com/chart?chs=200x200&chldM%%7C0&cht=qr&chl=%s", encodedData);
+			return String.format("https://www.google.com/chart?chs=200x200&chld=H|0&cht=qr&chl=%s", encodedData);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("generateQRCode", e);
+		}
+	}
+	
+	// private static final char   pad = '=';
+	// base32는 가장 작은 ascii는 2(62)이고 큰 ascii는 Z(132)이다. 총 71개
+	// base63는 가장 작은 ascii는 +(53)이고 큰 ascii는 z(172)이다. 총 120개
+	
+	static final String base32Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+	private static final int[] base32Lookup = new int[128];
+	static {
+		Arrays.fill(base32Lookup, -1);
+        for(int i=0; i<base32Chars.length(); ++i) {
+            base32Lookup[base32Chars.charAt(i)] = i;
+        }
+	}
+	
+	public static String encodeBase32(byte[] data) {
+		return encodeBase(data, base32Chars, 5);
+	}
+	
+	public static byte[] decodeBase32(String data) {
+		return decodeBase(data, base32Lookup, 5);
+	}
+	
+   
+    // RFC 4648: Base64
+    private static final String base64Chars =
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    
+    private static final int[] base64Lookup = new int[128];
+	static {
+		Arrays.fill(base64Lookup, -1);
+        for(int i=0; i<base64Chars.length(); ++i) {
+        	base64Lookup[base64Chars.charAt(i)] = i;
+        }
+	}
+	
+    public static String encodeBase64(byte[] data) {
+        return encodeBase(data, base64Chars, 6);
+    }
+    
+    public static byte[] decodeBase64(String data) {
+		return decodeBase(data, base64Lookup, 6);
+	}
+    
+    private static final String base64UrlChars =
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    
+    private static final int[] base64UrlLookup = new int[128];
+	static {
+		Arrays.fill(base64UrlLookup, -1);
+        for(int i=0; i<base64UrlChars.length(); ++i) {
+        	base64UrlLookup[base64UrlChars.charAt(i)] = i;
+        }
+	}
+	
+	public static String encodeBase64Url(byte[] data) {
+        return encodeBase(data, base64UrlChars, 6);
+    }
+    
+    public static byte[] decodeBase64Url(String data) {
+		return decodeBase(data, base64UrlLookup, 6);
+	}
+	
+    private static String encodeBase(byte[] data, String baseChars, int base) {
+        StringBuffer ret = new StringBuffer();
+        
+        int i = 0, c = 8, v = 0;
+        while(i < data.length) {
+            if(c < base) {
+                v = ((0xFF & (data[i] << (8-c))) >>> (8-base));
+                if (++i < data.length) { 
+                    v |= (0xFF & data[i]) >>> (8-base+c);
+                    c += 8-base;
+                }
+            } else {
+                v = (0xFF >> (8-base)) & (data[i] >>> (c-base));
+                if (0 == (c -= base)) {
+                	c = 8;
+                	++i;
+                }
+            }
+            
+            ret.append(baseChars.charAt(v));
+        }
+        
+        return ret.toString();
+    }
+    
+    public static byte[] decodeBase(String data, int[] baseTable, int base) {
+    	final int n = data.length();
+    	
+    	byte[] ret = new byte[n * base / 8];
+    	
+    	 int c = 0, p = 0, idx = 0, digit = 0;
+         for(int i=0; i<n; ++i) {
+             idx = data.charAt(i)-'0';
+             if(idx < 0 || baseTable.length <= idx) continue;
+             digit = baseTable[data.charAt(i)];
+             if(0xFF == digit) continue;
+             if(8-c < base) {
+                 ret[p] |= digit >>> (base-8+c);
+             	 if(++p < ret.length) {
+	         		 ret[p] |= digit << (16-base-c);
+	                 c = base - 8 + c;
+             	 }
+             } else {
+                 ret[p] |= digit << (8-base-c);
+                 c += base;
+             }
+         }
+         
+         return ret;
+    }
+    
+    public static byte[] randomBytes(int size) {
+		byte[] ret = new byte[size];
+		new Random().nextBytes(ret);
+		
+		return ret;
 	}
 }

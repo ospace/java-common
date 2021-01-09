@@ -1,5 +1,6 @@
 package com.tistory.ospace.common.util;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,6 +19,11 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 public class DataUtils {
 	
@@ -438,5 +444,32 @@ public class DataUtils {
 		}
 		
 		return ret;
+	}
+
+	/* mapping 구조
+	 *   node --> class
+	 *   attribute --> property
+	 *   
+	 *   <node>
+	 *     <name>foo</name>
+	 *   </node>
+	 *   
+	 *   <node name="foo"></node>
+	 *   
+	 *   class Node {
+	 *     private String name;
+	 *   }
+	 *   
+	 *   리스트형?
+	 *   
+	 * node or attribute -- mapping --> class property
+	 *   -> mapping meta information
+	 * return new class instance
+	 * 
+	 */
+	public static void sax(String data, DefaultHandler handler) throws SAXException, IOException  {
+		XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+		xmlReader.setContentHandler(handler);
+		xmlReader.parse(data);
 	}
 }

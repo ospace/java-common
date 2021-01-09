@@ -1,21 +1,19 @@
-package com.tistory.ospace.common.core;
+package com.tistory.ospace.common.util;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.tistory.ospace.common.util.ImageUtils;
-
-public class Image {
+public class ImageHelper {
 	private String        filepath;
 	private BufferedImage image;
 	
-	public static Image of(String filepath) throws IOException {
-		return new Image(ImageUtils.openImage(filepath), filepath);
+	public static ImageHelper of(String filepath) throws IOException {
+		return new ImageHelper(ImageUtils.openImage(filepath), filepath);
 	}
 	
-	private Image(BufferedImage image, String filepath) {
+	private ImageHelper(BufferedImage image, String filepath) {
 		this.image = image;
 		this.filepath = filepath;
 	}
@@ -40,7 +38,7 @@ public class Image {
 		watermark(ImageIO.read(new File(filepath)), alpha);
 	}
 	
-	public void watermark(Image image, float alpha) throws IOException {
+	public void watermark(ImageHelper image, float alpha) throws IOException {
 		watermark(image.getImage(), alpha);
 	}
 	
@@ -48,8 +46,8 @@ public class Image {
 		ImageUtils.watermark(image, waterImage, alpha);
 	}
 	
-	public Image resize(int width, int height, int mode) {
-		return new Image(ImageUtils.resize(image, width, height, mode), filepath);
+	public ImageHelper resize(int width, int height, int mode) {
+		return new ImageHelper(ImageUtils.resize(image, width, height, mode), filepath);
 	}
 	
 	public void save(String filepath) throws IOException {

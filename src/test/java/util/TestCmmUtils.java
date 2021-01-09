@@ -35,7 +35,7 @@ public class TestCmmUtils {
 		foo.setName("foo");
 		foo.setCreatedDate(LocalDateTime.now());
 		
-		foo.setData(new ArrayList<>(Arrays.asList(10, 11)));
+		foo.setData(new ArrayList<Integer>(Arrays.asList(10, 11)));
 		
 		Bar bar = new Bar();
 		
@@ -48,5 +48,37 @@ public class TestCmmUtils {
 		Assert.assertNull(bar.getId());
 		Assert.assertNull(bar.getCreatedDate());
 		Assert.assertEquals(foo.getData().size(), bar.getData().size());
+	}
+	
+	@Test
+	public void testEncodeBase32() {
+		logger.info("testEncodeBase32 begin");
+		
+		String data = "ospace";
+		String encoded = CmmUtils.encodeBase32(data.getBytes());
+		logger.info("testEncodeBase32 encoded[{}]", encoded);
+		Assert.assertEquals("N5ZXAYLDMU", encoded);
+		
+		String decoded = new String(CmmUtils.decodeBase32(encoded));
+		logger.info("testEncodeBase32 decoded[{}] size {} vs. {}", decoded, data.length(), decoded.length());
+		Assert.assertEquals(data, decoded);
+		
+		logger.info("testEncodeBase32 end");
+	}
+	
+	@Test
+	public void testEncodeBase64() {
+		logger.info("testEncodeBase64 begin");
+		
+		String data = "ospace";
+		String encoded = CmmUtils.encodeBase64(data.getBytes());
+		logger.info("testEncodeBase64 encoded[{}]", encoded);
+		Assert.assertEquals("b3NwYWNl", encoded);
+		
+		String decoded = new String(CmmUtils.decodeBase64(encoded));
+		logger.info("testEncodeBase64 decoded[{}]", decoded);
+		Assert.assertEquals(data, decoded);
+		
+		logger.info("testEncodeBase64 end");		
 	}
 }

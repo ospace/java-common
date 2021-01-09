@@ -26,6 +26,7 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -370,6 +371,14 @@ public class FileUtils {
 		}
 		
 		return ret;
+	}
+	
+	public static void move(String from, String to) {
+		try {
+			Files.move(Paths.get(from), Paths.get(to));
+		} catch (IOException e) {
+			throw new RuntimeException("move", e);
+		}
 	}
 }
 

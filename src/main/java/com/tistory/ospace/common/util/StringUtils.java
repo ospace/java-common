@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -229,5 +230,14 @@ public class StringUtils {
 		if(idx < str.length()) sb.append(str.substring(idx));
 		
 		return sb.toString();
+	}
+	
+	public static String toHexString(byte[] bytes) {
+		try (Formatter formatter = new Formatter()) {
+			for (byte b : bytes) {
+				formatter.format("%02x", b);
+			}
+			return formatter.toString();
+		}
 	}
 }

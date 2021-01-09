@@ -19,16 +19,19 @@ public class ImageUtils {
 	}
 	
 	public static void watermark(BufferedImage image, BufferedImage waterImage, float alpha) {
+		Graphics2D g = image.createGraphics();
+		
 		AlphaComposite comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+		g.setComposite(comp);
 		
 		int x = image.getWidth() - waterImage.getWidth();
 		int y = image.getHeight() - waterImage.getHeight();
-		Graphics2D g = image.createGraphics();
-		g.setComposite(comp);
 		g.drawImage(waterImage, x, y, null);
+		
 		g.dispose();
 	}
 	
+	//mode: 0 - not fit, 1 - fit width, 2 - fit height
 	public static BufferedImage resize(BufferedImage image, int width, int height, int mode) {
 		int x = 0, y = 0;
 		int resizeWidth = width, resizeHeight = height;
@@ -60,12 +63,11 @@ public class ImageUtils {
 	}
 	
 	public static void save(BufferedImage image, String filepath) throws IOException {
-		String ext = getExtention(filepath);
-		ImageIO.write(image, ext, new File(filepath));
+		ImageIO.write(image, getImageExtention(filepath), new File(filepath));
 	}
 	
 	public static void save(BufferedImage image, String filepath, float quality) throws IOException {
-		String ext = getExtention(filepath);
+		String ext = getImageExtention(filepath);
 		
 		ImageWriter writer = ImageIO.getImageWritersByFormatName(ext).next();
 		ImageWriteParam iwparam = writer.getDefaultWriteParam();
@@ -84,8 +86,42 @@ public class ImageUtils {
 		}
 	}
 	
-	public static String getExtention(String filepath) {
-		int pos = filepath.lastIndexOf('.');
-		return 0 < pos ? filepath.substring(pos+1) : "jpg";
+	public static int findJpegBegin(byte[] data, int offset) {
+		for(int i=offset, n=data.length-1; i<n; ++i) {
+			if(isJpegBoi(data[i], data[i+1])) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	/* example
+	 * byte[] buf = …;
+	 * int boi = MjpgUtils.findJpegBegin(buf, 0);
+	 * int eoi = MjpgUtils.findJpegEnd(buf, boi+2);
+	 * 
+	 * byte[] jpeg = Arrays.copyOfRange(buf, boi, eoi); 
+	 */
+	public static int findJpegEnd(byte[] data, int offset) {
+		for(int i=offset, n=data.length-1; i<n; ++i) {
+			if(isJpegEoi(data[i], data[i+1])) {
+				return i + 2;
+			}
+		}
+		return -1;
+	}
+
+	private static final byte[]  JPEG_BOI = { (byte)0xff, (byte)0xd8 };
+	public static boolean isJpegBoi(byte l, byte r) {
+		return JPEG_BOI[0] == l && JPEG_BOI[1] == r;
+	}
+	
+	private static final byte[]  JPEG_EOI = { (byte)0xff, (byte)0xd9 };
+	public static boolean isJpegEoi(byte l, byte r) {
+		return JPEG_EOI[0] == l && JPEG_EOI[1] == r;
+	}
+	
+	private static String getImageExtention(String filepath) {
+		return StringUtils.isEmpty(FileUtils.getExtension(filepath), "jpg");
 	}
 }

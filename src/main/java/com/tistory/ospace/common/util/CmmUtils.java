@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.reflections.Reflections;
 
@@ -482,5 +484,25 @@ public class CmmUtils {
 	
 	public static boolean isLocalAddress(String ipAddr) {
 	    return -1 < AUTH_REMOATEADDRS.indexOf(ipAddr);
+	}
+	
+	private static final Pattern JSON_ARRAY_PTN = Pattern.compile("(\\S+)\\[(\\d+)\\]");
+	public JsonNode getJsonNode(JsonNode node, String query) {
+		assert null != query && !query.isEmpty();
+		
+		String keywords[] = query.split("\\.");
+		JsonNode current = node;
+		for(String it : keywords) {
+			Matcher matcher = JSON_ARRAY_PTN.matcher(it);
+			if (null == matcher || !matcher.find()) {
+				current = current.path(it);
+			} else {
+				int cnt = matcher.groupCount();
+				if(2 != cnt) throw new RuntimeException("invalid arrary query : " + it);
+				current = current.path(matcher.group(1)).path(Integer.parseInt(matcher.group(2)));
+			}
+		}
+		
+		return current;
 	}
 }

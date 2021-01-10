@@ -363,11 +363,11 @@ public class DataUtils {
 		return ret;
 	}
 
-	public static <P> Collection<Collection<P>> combination(Collection<Collection<P>> dataSet) {
+	public static <P> List<List<P>> combination(List<List<P>> dataSet) {
 		return reduce(dataSet, DataUtils::combination);
 	}
 
-	public static <P> Collection<Collection<P>> combination(Collection<Collection<P>> ret, Collection<P> values) {
+	public static <P> List<List<P>> combination(List<List<P>> ret, Collection<P> values) {
 		if(isEmpty(ret)) {
 			return reduce(values, (r,v)->r.add(new ArrayList<>(Arrays.asList(v))), new ArrayList<>());
 		}
@@ -375,7 +375,7 @@ public class DataUtils {
 		return reduce(ret, (r,d)->iterate(values, v->r.add(add(d, v))), new ArrayList<>());
 	}
 
-	public static <P> List<List<P>> transform(Collection<Collection<P>> dataSet) {
+	public static <P> List<List<P>> transform(List<List<P>> dataSet) {
 		int max_size = maxSize(dataSet);
 		List<List<P>> ret = new ArrayList<>();
 		for(int i=0; i<max_size; ++i) ret.add(new ArrayList<>());
@@ -413,7 +413,7 @@ public class DataUtils {
 		}
 	}
 	
-	public static <P> int maxSize(Collection<Collection<P>> list) {
+	public static <P> int maxSize(List<List<P>> list) {
 		if (isEmpty(list)) return 0;
 		int max_size = 0;
 		for(Collection<P> it : list) {

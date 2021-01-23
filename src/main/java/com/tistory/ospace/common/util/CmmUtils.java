@@ -26,6 +26,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.reflections.Reflections;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -80,7 +84,7 @@ public class CmmUtils {
 	    		DataUtils.map(toPropertyDescriptors, key->key.getName(), value->value);
 
 	    List<String> ignoreList = asList(ignoreProperties);
-	    DataUtils.iterate(fromPropertyDescriptors, propertyDescriptor->{
+	    DataUtils.forEach(fromPropertyDescriptors, propertyDescriptor->{
 	        Method getterMethod = propertyDescriptor.getReadMethod();
 	        if(null == getterMethod) return;
 	        
@@ -504,5 +508,32 @@ public class CmmUtils {
 		}
 		
 		return current;
+	}
+	
+	/* mapping 구조
+	 *   node --> class
+	 *   attribute --> property
+	 *   
+	 *   <node>
+	 *     <name>foo</name>
+	 *   </node>
+	 *   
+	 *   <node name="foo"></node>
+	 *   
+	 *   class Node {
+	 *     private String name;
+	 *   }
+	 *   
+	 *   리스트형?
+	 *   
+	 * node or attribute -- mapping --> class property
+	 *   -> mapping meta information
+	 * return new class instance
+	 * 
+	 */
+	public static void sax(String data, DefaultHandler handler) throws SAXException, IOException  {
+		XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+		xmlReader.setContentHandler(handler);
+		xmlReader.parse(data);
 	}
 }

@@ -1,6 +1,5 @@
 package com.tistory.ospace.common.util;
 
-import java.io.IOException;
 import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,6 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -19,11 +19,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 public class DataUtils {
 	
@@ -43,25 +38,33 @@ public class DataUtils {
 		return (null == obj || obj.isEmpty());
 	}
 
-	public static <P> void iterate(Collection<P> data, Consumer<P> action) {
-		if(isEmpty(data)) return;
+	public static <P> void forEach(Collection<P> data, Consumer<P> action) {
+		Objects.requireNonNull(action);
 		
+		if(isEmpty(data)) return;
+
 		for(P it: data) action.accept(it);
 	}
 
-	public static <P> void iterate(P[] data, Consumer<P> action) {
+	public static <P> void forEach(P[] data, Consumer<P> action) {
+		Objects.requireNonNull(action);
+		
 		if (isEmpty(data)) return;
 		
 		for(P it: data) action.accept(it);
 	}
 	
-	public static <P> void iterate(P[][] data, Consumer<P[]> action) {
+	public static <P> void forEach(P[][] data, Consumer<P[]> action) {
+		Objects.requireNonNull(action);
+		
 		if (isEmpty(data)) return;
 		
 		for(P[] it: data) action.accept(it);
 	}
 	
-	public static <P> void iterate(Enumeration<P> data,  Consumer<P> action) {
+	public static <P> void forEach(Enumeration<P> data,  Consumer<P> action) {
+		Objects.requireNonNull(action);
+		
 		if (null == data) return;
 		
 		while(data.hasMoreElements()) {
@@ -70,18 +73,24 @@ public class DataUtils {
 	}
 	
 	public static <P> void until(Collection<P> data, Predicate<P> action) {
+		Objects.requireNonNull(action);
+		
 		if(isEmpty(data)) return;
 		
 		for(P it: data) if(action.test(it)) break;
 	}
 	
 	public static <P> void until(P[] data, Predicate<P> action) {
+		Objects.requireNonNull(action);
+		
 		if(isEmpty(data)) return;
 		
 		for(P it: data) if(action.test(it)) break;
 	}
 	
 	public static <P> void until(Enumeration<P> data, Predicate<P> action) {
+		Objects.requireNonNull(action);
+		
 		if (null == data) return;
 		
 		while(data.hasMoreElements()) {
@@ -91,6 +100,8 @@ public class DataUtils {
 	}
 	
 	public static <P> P findFirst(Collection<P> data, Predicate<P> filter) {
+		Objects.requireNonNull(filter);
+		
 		if (isEmpty(data)) return null;
 		
 		for(P it: data) {
@@ -101,6 +112,8 @@ public class DataUtils {
 	}
 
 	public static <P> P findFirst(P[] data, Predicate<P> filter) {
+		Objects.requireNonNull(filter);
+		
 		if (isEmpty(data)) return null;
 		
 		for(P it: data) {
@@ -111,6 +124,8 @@ public class DataUtils {
 	}
 	
 	public static <P> P findFirst(Enumeration<P> data, Predicate<P> filter) {
+		Objects.requireNonNull(filter);
+		
 		if (null == data) return null;
 		
 		while(data.hasMoreElements()) {
@@ -123,6 +138,8 @@ public class DataUtils {
 
 	//필터 조건에 맞는 대상은 제거됨
 	public static <P> List<P> filter(Collection<P> data, Predicate<P> filter) {
+		Objects.requireNonNull(filter);
+		
 		if (isEmpty(data)) return null;
 		
 		List<P> ret = new ArrayList<>();
@@ -133,6 +150,8 @@ public class DataUtils {
 
 	//필터 조건에 맞는 대상은 제거됨
 	public static <P> List<P> filter(P[] data, Predicate<P> filter) {
+		Objects.requireNonNull(filter);
+		
 		if (isEmpty(data)) return null;
 		
 		List<P> ret = new ArrayList<>();
@@ -142,6 +161,8 @@ public class DataUtils {
 	}
 	
 	public static <P> List<P> filter(Enumeration<P> data, Predicate<P> filter) {
+		Objects.requireNonNull(filter);
+		
 		if (null == data) return null;
 		
 		List<P> ret = new ArrayList<>();
@@ -154,6 +175,8 @@ public class DataUtils {
 	}
 
 	public static <R, P> List<R> map(Collection<P> data, Function<P, R> action) {
+		Objects.requireNonNull(action);
+		
 		if (isEmpty(data)) return null;
 		
 		List<R> ret = new ArrayList<>();
@@ -163,6 +186,8 @@ public class DataUtils {
 	}
 
 	public static <R, P> List<R> map(P[] data, Function<P, R> action) {
+		Objects.requireNonNull(action);
+		
 		if (isEmpty(data)) return null;
 		
 		List<R> ret = new ArrayList<>();
@@ -172,6 +197,8 @@ public class DataUtils {
 	}
 	
 	public static <R, P> List<R> map(Enumeration<P> data, Function<P, R> action) {
+		Objects.requireNonNull(action);
+		
 		if (null == data) return null;
 		
 		List<R> ret = new ArrayList<>();
@@ -183,6 +210,9 @@ public class DataUtils {
 	}
 	
 	public static <K, V, P> Map<K,V> map(Collection<P> data, Function<P, K> key, Function<P, V> value) {
+		Objects.requireNonNull(key);
+		Objects.requireNonNull(value);
+		
 		if (isEmpty(data)) return null;
 		
 		Map<K,V> ret = new HashMap<>();
@@ -192,6 +222,9 @@ public class DataUtils {
 	}
 
 	public static <K, V, P> Map<K,V> map(P[] data, Function<P, K> key, Function<P, V> value) {
+		Objects.requireNonNull(key);
+		Objects.requireNonNull(value);
+		
 		if (isEmpty(data)) return null;
 		
 		Map<K,V> ret = new HashMap<>();
@@ -201,6 +234,9 @@ public class DataUtils {
 	}
 	
 	public static <K, V, P> Map<K,V> map(Enumeration<P> data, Function<P, K> key, Function<P, V> value) {
+		Objects.requireNonNull(key);
+		Objects.requireNonNull(value);
+		
 		if (null == data) return null;
 		
 		Map<K,V> ret = new HashMap<>();
@@ -213,30 +249,42 @@ public class DataUtils {
 	}
 	
 	public static <R, P> List<R> map(Collection<P> data, Function<P, R> action, ExecutorService executor) {
+		Objects.requireNonNull(action);
+		
 		return map(data, action, null, executor);
 	}
 	
 	public static <R, P> List<R> map(Collection<P> data, Function<P, R> action, BiFunction<P, Throwable, R> except, ExecutorService executor) {
+		Objects.requireNonNull(action);
+		
 		if (isEmpty(data)) return null;
 		
 		return allOf(map(data, it->createFuture(it, action, except, executor)));
 	}
 	
 	public static <R, P> List<R> map(P[] data, Function<P, R> action, ExecutorService executor) {
+		Objects.requireNonNull(action);
+		
 		return map(data, action, null, executor);
 	}
 	
 	public static <R, P> List<R> map(P[] data, Function<P, R> action, BiFunction<P, Throwable, R> except, ExecutorService executor) {
+		Objects.requireNonNull(action);
+		
 		if (isEmpty(data)) return null;
 		
 		return allOf(map(data, it->createFuture(it, action, except, executor)));
 	}
 	
 	public static <R, P> List<R> map(Enumeration<P> data, Function<P, R> action, ExecutorService executor) {
+		Objects.requireNonNull(action);
+		
 		return map(data, action, null, executor);
 	}
 	
 	public static <R, P> List<R> map(Enumeration<P> data, Function<P, R> action, BiFunction<P, Throwable, R> except, ExecutorService executor) {
+		Objects.requireNonNull(action);
+		
 		if (null == data) return null;
 		
 		return allOf(map(data, it->createFuture(it, action, except, executor)));
@@ -268,6 +316,8 @@ public class DataUtils {
 	}
 	
 	public static <K, P> Map<K, List<P>> partitioning(Collection<P> data, Function<P, K> key) {
+		Objects.requireNonNull(key);
+		
 		if (isEmpty(data)) return null;
 		
 		Map<K, List<P>> ret = new HashMap<>();
@@ -277,6 +327,8 @@ public class DataUtils {
 	}
 	
 	public static <K, P> Map<K, List<P>> partitioning(P[] data, Function<P, K> key) {
+		Objects.requireNonNull(key);
+		
 		if (isEmpty(data)) return null;
 		
 		Map<K, List<P>> ret = new HashMap<>();
@@ -286,6 +338,8 @@ public class DataUtils {
 	}
 	
 	public static <K, P> Map<K, List<P>> partitioning(Enumeration<P> data, Function<P, K> key) {
+		Objects.requireNonNull(key);
+		
 		if (null == data) return null;
 		
 		Map<K, List<P>> ret = new HashMap<>();
@@ -308,6 +362,8 @@ public class DataUtils {
 
 
 	public static <R, P> R reduce(Collection<P> data, BiConsumer<R, P> action, R init) {
+		Objects.requireNonNull(action);
+		
 		if (isEmpty(data)) return init;
 		
 		for(P it: data) action.accept(init, it);
@@ -316,6 +372,8 @@ public class DataUtils {
 	}
 	
 	public static <R, P> R reduce(P[] data, BiConsumer<R, P> action, R init) {
+		Objects.requireNonNull(action);
+		
 		if (isEmpty(data)) return init;
 		
 		for(P it: data) action.accept(init, it);
@@ -324,6 +382,8 @@ public class DataUtils {
 	}
 	
 	public static <R, P> R reduce(Enumeration<P> data, BiConsumer<R, P> action, R init) {
+		Objects.requireNonNull(action);
+		
 		if (null == data) return init;
 		
 		while(data.hasMoreElements()) {
@@ -335,6 +395,8 @@ public class DataUtils {
 	
 
 	public static <R, P> R reduce(Collection<P> data, BiFunction<R, P, R> action) {
+		Objects.requireNonNull(action);
+		
 		if (isEmpty(data)) return null;
 		
 		R ret = null;
@@ -344,6 +406,8 @@ public class DataUtils {
 	}
 	
 	public static <R, P> R reduce(P[] data, BiFunction<R, P, R> action) {
+		Objects.requireNonNull(action);
+		
 		if (isEmpty(data)) return null;
 		
 		R ret = null;
@@ -353,6 +417,8 @@ public class DataUtils {
 	}
 	
 	public static <R, P> R reduce(Enumeration<P> data, BiFunction<R, P, R> action) {
+		Objects.requireNonNull(action);
+		
 		if (null == data) return null;
 		
 		R ret = null;
@@ -372,7 +438,7 @@ public class DataUtils {
 			return reduce(values, (r,v)->r.add(new ArrayList<>(Arrays.asList(v))), new ArrayList<>());
 		}
 		
-		return reduce(ret, (r,d)->iterate(values, v->r.add(add(d, v))), new ArrayList<>());
+		return reduce(ret, (r,d)->forEach(values, v->r.add(add(d, v))), new ArrayList<>());
 	}
 
 	public static <P> List<List<P>> transform(List<List<P>> dataSet) {
@@ -422,6 +488,13 @@ public class DataUtils {
 		}
 		
 		return max_size;
+	}
+	
+	public static <P> int maxSize2(List<List<P>> list) {
+		return reduce(list, (ret, it)->{
+			if (null == ret) return it.size();
+			return ret < it.size() ? it.size() : ret; 
+		});
 	}
 	
 	public static <P> P[] toArray(Collection<P> data) {
@@ -474,32 +547,5 @@ public class DataUtils {
 		}
 		
 		return false;
-	}
-
-	/* mapping 구조
-	 *   node --> class
-	 *   attribute --> property
-	 *   
-	 *   <node>
-	 *     <name>foo</name>
-	 *   </node>
-	 *   
-	 *   <node name="foo"></node>
-	 *   
-	 *   class Node {
-	 *     private String name;
-	 *   }
-	 *   
-	 *   리스트형?
-	 *   
-	 * node or attribute -- mapping --> class property
-	 *   -> mapping meta information
-	 * return new class instance
-	 * 
-	 */
-	public static void sax(String data, DefaultHandler handler) throws SAXException, IOException  {
-		XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-		xmlReader.setContentHandler(handler);
-		xmlReader.parse(data);
 	}
 }

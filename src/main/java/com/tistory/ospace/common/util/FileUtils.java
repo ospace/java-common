@@ -351,7 +351,7 @@ public class FileUtils {
 			
 			try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(output))) {
 				byte[] buf = new byte[BUFFER_SIZE];
-				DataUtils.iterate(fetchFile.entries(), it->{
+				DataUtils.forEach(fetchFile.entries(), it->{
 					String name = it.getName();
 					if(!(newFiles.contains(name) || modifyFiles.contains(name))) return;
 					

@@ -3,6 +3,7 @@ package util;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -13,7 +14,15 @@ public class TestDataUtils {
 	@Test
 	public void testIterate() {
 		String weeks[] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
-		DataUtils.iterate(weeks, it->System.out.print(it));
+		DataUtils.forEach(weeks, it->System.out.print(it));
+		
+		Vector<String> data = new Vector<>();
+		data.add("SUN");
+		data.add("MON");
+		
+		data.elements();
+		
+		DataUtils.forEach(data, it->System.out.print(it));
 	}
 	
 	@Test

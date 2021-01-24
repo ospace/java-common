@@ -72,6 +72,44 @@ public class DataUtils {
 		}
 	}
 	
+	public static <P> void forEach(Collection<P> data, BiConsumer<P, Integer> action) {
+		Objects.requireNonNull(action);
+		
+		if(isEmpty(data)) return;
+
+		int i=0;
+		for(P it: data) action.accept(it,i++);
+	}
+	
+	public static <P> void forEach(P[] data, BiConsumer<P, Integer> action) {
+		Objects.requireNonNull(action);
+		
+		if (isEmpty(data)) return;
+		
+		int i=0;
+		for(P it: data) action.accept(it, i++);
+	}
+	
+	public static <P> void forEach(P[][] data, BiConsumer<P[], Integer> action) {
+		Objects.requireNonNull(action);
+		
+		if (isEmpty(data)) return;
+		
+		int i=0;
+		for(P[] it: data) action.accept(it, i++);
+	}
+	
+	public static <P> void forEach(Enumeration<P> data,  BiConsumer<P, Integer> action) {
+		Objects.requireNonNull(action);
+		
+		if (null == data) return;
+		
+		int i=0;
+		while(data.hasMoreElements()) {
+			action.accept(data.nextElement(), i++);
+		}
+	}
+	
 	public static <P> void until(Collection<P> data, Predicate<P> action) {
 		Objects.requireNonNull(action);
 		
@@ -548,4 +586,5 @@ public class DataUtils {
 		
 		return false;
 	}
+
 }

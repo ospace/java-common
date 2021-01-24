@@ -1,5 +1,6 @@
 package util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -12,17 +13,31 @@ import com.tistory.ospace.common.util.DataUtils;
 
 public class TestDataUtils {
 	@Test
-	public void testIterate() {
-		String weeks[] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
-		DataUtils.forEach(weeks, it->System.out.print(it));
+	public void testforEach() {
+		String weeks[] = {"one", "two", "three"};
+		String expected1 = "onetwothree";
+		String expected2 = "one0two1three2";
+		
+		StringBuilder sb = new StringBuilder();
+		DataUtils.forEach(weeks, it->sb.append(it));
+		Assert.assertTrue(expected1.equals(sb.toString()));
+		
+		sb.setLength(0);
+		DataUtils.forEach(weeks, (it,idx)->sb.append(it).append(idx));
+		Assert.assertTrue(expected2.equals(sb.toString()));
 		
 		Vector<String> data = new Vector<>();
-		data.add("SUN");
-		data.add("MON");
+		data.add("one");
+		data.add("two");
+		data.add("three");
+
+		sb.setLength(0);
+		DataUtils.forEach(data, it->sb.append(it));
+		Assert.assertTrue(expected1.equals(sb.toString()));
 		
-		data.elements();
-		
-		DataUtils.forEach(data, it->System.out.print(it));
+		sb.setLength(0);
+		DataUtils.forEach(data, (it,idx)->sb.append(it).append(idx));
+		Assert.assertTrue(expected2.equals(sb.toString()));
 	}
 	
 	@Test
@@ -72,9 +87,14 @@ public class TestDataUtils {
 	
 	@Test
 	public void testZip() {
-		List<Foo> foos1 = Arrays.asList(new Foo("ten", 10), new Foo("twenty", 20), new Foo("thrity", 30));
+		List<Foo> foos1 = Arrays.asList(new Foo("ten", 10), new Foo("twenty", 20), new Foo("thirty", 30));
 		List<Foo> foos2 = Arrays.asList(new Foo("one", 1), new Foo("two", 2), new Foo("three", 3));
-		DataUtils.zip(foos1, foos2, (l,r)->System.out.println(l.getName()+" "+r.getName()+" : "+(l.getNum()+r.getNum())));
+		
+		List<String> res = new ArrayList<>();
+		DataUtils.zip(foos1, foos2, (l,r)->res.add(l.getName()+"+"+r.getName()+"="+(l.getNum()+r.getNum())));
+		
+		String[] expected = {"ten+one=11", "twenty+two=22", "thirty+three=33"};
+		Assert.assertArrayEquals(expected, res.toArray());
 	}
 	
 	@Test

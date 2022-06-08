@@ -10,7 +10,7 @@ fi
 PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
 PROJECT_NAME=$(mvn -q --non-recursive exec:exec -Dexec.executable=echo -Dexec.args='${project.artifactId}')
 
-mvn -Dmaven.test.skip=true -DaltDeploymentRepository=snapshot::default::file:${LOCAL_MAVEN_REPO}/maven/snapshots clean deploy
+mvn -Dmaven.test.skip=true -DaltDeploymentRepository=snapshot::default::file:${LOCAL_MAVEN_REPO}/maven clean deploy
 
 if [ $? -ne 0 ]; then
     echo "ERROR: Maven deploy failed"

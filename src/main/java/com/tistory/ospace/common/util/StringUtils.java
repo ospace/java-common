@@ -89,7 +89,7 @@ public class StringUtils {
 		return UUID.randomUUID().toString().replace("-", "");
 	}
 	
-	private static Pattern formatPattern = Pattern.compile("\\{(\\w+?\\)}");
+	private static Pattern formatPattern = Pattern.compile("\\{(\\w+?)\\}");
 	public static String format(String fmt, Object ...args) {
 		StringBuffer ret = new StringBuffer();
 		

@@ -25,11 +25,14 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.reflections.Reflections;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -229,8 +232,8 @@ public class CmmUtils {
 		assert null != clazz : "clazz must not null";
 		
 		try {
-			return clazz.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+			return clazz.getDeclaredConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			throw new RuntimeException("create " + clazz.getSimpleName(), e);
 		}
 	}
@@ -531,9 +534,17 @@ public class CmmUtils {
 	 * return new class instance
 	 * 
 	 */
-	public static void sax(String data, DefaultHandler handler) throws SAXException, IOException  {
-		XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+	public static void sax(String data, DefaultHandler handler) throws IOException, ParserConfigurationException, SAXException  {
+		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+		SAXParser parser = parserFactory.newSAXParser();
+		XMLReader xmlReader = parser.getXMLReader();
 		xmlReader.setContentHandler(handler);
 		xmlReader.parse(data);
+	}
+
+	public static <T> Field ofField(String fieldName, Class<T> clazz) throws NoSuchFieldException, SecurityException {
+		Field ret = clazz.getDeclaredField(fieldName);
+		ret.setAccessible(true);
+		return ret;
 	}
 }

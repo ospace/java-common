@@ -1,10 +1,10 @@
 package com.tistory.ospace.common.util;
 
 import java.lang.reflect.Array;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,8 +20,246 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class DataUtils {
+public abstract class DataUtils<T> {
+	public abstract boolean isEmpty();
+	public abstract boolean contains(T val);
+	public abstract int size();
+	public abstract DataUtils<T> forEach(Consumer<T> action);
+	public abstract DataUtils<T> forEach(BiConsumer<T, Integer> action);
+	public abstract DataUtils<T> until(Predicate<T> action);
+	public abstract T findFirst(Predicate<T> filter);
+	public abstract DataUtils<T> filter(Predicate<T> filter);
+	public abstract <R> DataUtils<R> map(Function<T, R> action);
+	public abstract <R> DataUtils<R> map(Function<T, R> action, ExecutorService executor);
+	public abstract <R> DataUtils<R> map(Function<T, R> action, BiFunction<T, Throwable, R> except, ExecutorService executor);
+	public abstract <K, V> Map<K,V> map(Function<T, K> key, Function<T, V> value);
+	public abstract <K> Map<K, List<T>> partitioning(Function<T, K> key);
+	public abstract <R> R reduce(BiFunction<R, T, R> action);
+	public abstract <R> R reduce(BiConsumer<R, T> action, R init);
+	public abstract List<T> toList();
+	public abstract T[] toArray();
+	public abstract Object valueOf();
 	
+	public static <P> DataUtils<P> of(P[] data) {
+		return new DataArray<P>(data);
+	}
+	
+	public static <P> DataUtils<P> of(Collection<P> data) {
+		return new DataCollection<P>(data);
+	}
+	
+	public static <P> DataUtils<P> of(Enumeration<P> data) {
+		return new DataCollection<P>(Collections.list(data));
+	}
+	
+	static class DataArray<T> extends DataUtils<T> {
+		T[] data;
+		
+		public DataArray(T[] data) {
+			this.data = data;
+		}
+		
+		@Override
+		public boolean isEmpty() {
+			return DataUtils.isEmpty(this.data);
+		}
+		
+		@Override
+		public boolean contains(T val) {
+			return DataUtils.contains(this.data, val);
+		}
+		
+		@Override
+		public int size() {
+			return isEmpty() ? 0 : data.length;
+		}
+		
+		@Override
+		public DataUtils<T> forEach(Consumer<T> action) {
+			DataUtils.forEach(this.data, action);
+			return this;
+		}
+		
+		@Override
+		public DataUtils<T> forEach(BiConsumer<T, Integer> action) {
+			DataUtils.forEach(this.data, action);
+			return this;
+		}
+		
+		@Override
+		public DataUtils<T> until(Predicate<T> action) {
+			DataUtils.until(this.data, action);
+			return this;
+		}
+		
+		@Override
+		public T findFirst(Predicate<T> filter) {
+			return DataUtils.findFirst(data, filter);
+		}
+		
+		@Override
+		public DataUtils<T> filter(Predicate<T> filter) {
+			return of(DataUtils.filter(this.data, filter));
+		}
+
+		@Override
+		public <R> DataUtils<R> map(Function<T, R> action) {
+			return of(DataUtils.map(this.data, action));
+		}
+
+		@Override
+		public <R> DataUtils<R> map(Function<T, R> action, ExecutorService executor) {
+			return of(DataUtils.map(this.data, action, executor));
+		}
+		
+		@Override
+		public <R> DataUtils<R> map(Function<T, R> action, BiFunction<T, Throwable, R> except, ExecutorService executor) {
+			return of(DataUtils.map(this.data, action, except, executor));
+		}
+		
+		@Override
+		public <K, V> Map<K, V> map(Function<T, K> key, Function<T, V> value) {
+			return DataUtils.map(this.data, key, value);
+		}
+
+		@Override
+		public <K> Map<K, List<T>> partitioning(Function<T, K> key) {
+			return DataUtils.partitioning(this.data, key);
+		}
+		
+		@Override
+		public <R> R reduce(BiFunction<R, T, R> action) {
+			return DataUtils.reduce(this.data, action);
+		}
+		
+		@Override
+		public <R> R reduce(BiConsumer<R, T> action, R init) {
+			return DataUtils.reduce(this.data, action, init);
+		}
+		
+		@Override
+		public Object valueOf() {
+			return this.data;
+		}
+		
+		@Override
+		public List<T> toList() {
+			if (DataUtils.isEmpty(this.data)) return null;
+			return Arrays.asList(this.data);
+		}
+
+		@Override
+		public T[] toArray() {
+			if (isEmpty(data)) return null;
+			return Arrays.copyOf(this.data, this.data.length);
+		}
+	}
+	
+	static class DataCollection<T> extends DataUtils<T> {
+		Collection<T> data;
+		
+		public DataCollection(Collection<T> data) {
+			this.data = data;
+		}
+		
+		@Override
+		public boolean isEmpty() {
+			return DataUtils.isEmpty(this.data);
+		}
+		
+		@Override
+		public boolean contains(T val) {
+			return DataUtils.contains(this.data, val);
+		}
+		
+		@Override
+		public int size() {
+			return isEmpty() ? 0 : data.size();
+		}
+		
+		@Override
+		public DataUtils<T> forEach(Consumer<T> action) {
+			DataUtils.forEach(this.data, action);
+			return this;
+		}
+		
+		@Override
+		public DataUtils<T> forEach(BiConsumer<T, Integer> action) {
+			DataUtils.forEach(this.data, action);
+			return this;
+		}
+		
+		@Override
+		public DataUtils<T> until(Predicate<T> action) {
+			DataUtils.until(this.data, action);
+			return this;
+		}
+		
+		@Override
+		public T findFirst(Predicate<T> filter) {
+			return DataUtils.findFirst(data, filter);
+		}
+		
+		@Override
+		public DataUtils<T> filter(Predicate<T> filter) {
+			return of(DataUtils.filter(this.data, filter));
+		}
+
+		@Override
+		public <R> DataUtils<R> map(Function<T, R> action) {
+			return of(DataUtils.map(this.data, action));
+		}
+		
+		@Override
+		public <R> DataUtils<R> map(Function<T, R> action, ExecutorService executor) {
+			return of(DataUtils.map(this.data, action, executor));
+		}
+		
+		@Override
+		public <R> DataUtils<R> map(Function<T, R> action, BiFunction<T, Throwable, R> except, ExecutorService executor) {
+			return of(DataUtils.map(this.data, action, except, executor));
+		}
+		
+		@Override
+		public <K, V> Map<K, V> map(Function<T, K> key, Function<T, V> value) {
+			return DataUtils.map(this.data, key, value);
+		}
+		
+		@Override
+		public <K> Map<K, List<T>> partitioning(Function<T, K> key) {
+			return DataUtils.partitioning(this.data, key);
+		}
+		
+		@Override
+		public <R> R reduce(BiFunction<R, T, R> action) {
+			return DataUtils.reduce(this.data, action);
+		}
+		
+		@Override
+		public <R> R reduce(BiConsumer<R, T> action, R init) {
+			return DataUtils.reduce(this.data, action, init);
+		}
+
+		@Override
+		public Object valueOf() {
+			return this.data;
+		}
+		
+		@Override
+		public List<T> toList() {
+			if (DataUtils.isEmpty(data)) return null;
+			return new ArrayList<>(this.data);
+		}
+
+		@Override
+		public T[] toArray() {
+			if (DataUtils.isEmpty(data)) return null;
+			@SuppressWarnings("unchecked")
+			T[] inst = (T[])Array.newInstance(this.data.getClass().getComponentType(), this.data.size());
+			return this.data.toArray(inst);
+		}
+	}
+
 	public static <P> boolean isEmpty(P[] obj) {
 		return (null == obj || 0 == obj.length);
 	}
@@ -32,6 +270,10 @@ public class DataUtils {
 	
 	public static <P> boolean isEmpty(Collection<P> obj) {
 		return (null == obj || obj.isEmpty());
+	}
+	
+	public static <P> boolean isEmpty(Enumeration<P> obj) {
+		return (null == obj || !obj.hasMoreElements());
 	}
 
 	public static <K, V> boolean isEmpty(Map<K, V> obj) {
@@ -105,7 +347,7 @@ public class DataUtils {
 		if (null == data) return;
 		
 		int i=0;
-		while(data.hasMoreElements()) {
+ 		while(data.hasMoreElements()) {
 			action.accept(data.nextElement(), i++);
 		}
 	}
@@ -490,6 +732,10 @@ public class DataUtils {
 		
 		return ret;
 	}
+	
+	public static <P> List<P> add(P[] l, P r) {
+		return null;
+	}
 
 	public static <P> List<P> add(Collection<P> l, P r) {
 		List<P> ret = new ArrayList<>(l);
@@ -551,16 +797,6 @@ public class DataUtils {
 		return ret;
 	}
 	
-	public static List<LocalDate> range(LocalDate first, LocalDate last) {
-		List<LocalDate> ret = new ArrayList<>();
-		
-		for(LocalDate it = first; it.isBefore(last); it=it.plusDays(1)) {
-		    ret.add(it);
-		}
-		
-		return ret;
-	}
-	
 	public static <P> boolean contains(P[] data, P val) {
 		if (isEmpty(data)) return false;
 		
@@ -586,5 +822,4 @@ public class DataUtils {
 		
 		return false;
 	}
-
 }

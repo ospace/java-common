@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -13,9 +14,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
 public class DateUtils {
@@ -437,5 +440,22 @@ public class DateUtils {
         }
         return result;
     }
+    
+    /***
+     * 시작일에서 마지막일 까지 일일 단위 일자 목록
+     * 
+     * @param first : 시작일
+     * @param last : 마지막일
+     * @return List<LocalDate>
+     */
+	public static List<LocalDate> range(LocalDate first, LocalDate last) {
+		List<LocalDate> ret = new ArrayList<>();
+		
+		for(LocalDate it = first; it.isBefore(last); it=it.plusDays(1)) {
+		    ret.add(it);
+		}
+		
+		return ret;
+	}
 }
 

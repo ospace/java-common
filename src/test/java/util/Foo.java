@@ -49,6 +49,6 @@ public class Foo {
 	}
 	@Override
 	public String toString() {
-		return "Foo [id=" + id + ", name=" + name + ", createdDate=" + createdDate + ", data=" + data + "]";
+		return "Foo [id=" + id + ", name=" + name + ", num=" + num + ", createdDate=" + createdDate + ", data=" + data + "]";
 	}
 }
